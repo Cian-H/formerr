@@ -1,7 +1,8 @@
-program tester
+program check
   use, intrinsic :: iso_fortran_env, only : error_unit
   use testdrive, only : run_testsuite, new_testsuite, testsuite_type
   use either_suite, only : collect_either_suite
+  use option_suite, only : collect_option_suite
   implicit none
   integer :: stat, is
   type(testsuite_type), allocatable :: testsuites(:)
@@ -10,7 +11,8 @@ program tester
   stat = 0
 
   testsuites = [ &
-    new_testsuite("either_suite", collect_either_suite) &
+    new_testsuite("either_suite", collect_either_suite), &
+    new_testsuite("option_suite", collect_option_suite) &
     ]
 
   do is = 1, size(testsuites)
@@ -23,4 +25,4 @@ program tester
     error stop
   end if
 
-end program tester
+end program check
