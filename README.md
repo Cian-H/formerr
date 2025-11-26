@@ -39,54 +39,54 @@ Use Result when an operation might succeed or fail. It wraps either a success va
 error value (Err).
 
 ```fortran
-program demo\_result
-    use formerr\_result
+program demo_result
+    use formerr_result
     implicit none
 
-    type(result\_type) :: res
-    class(\*), pointer :: val
+    type(result_type) :: res
+    class(*), pointer :: val
 
-    \! 1\. Successful operation
-    res \= divide(10.0, 2.0)
+    ! 1. Successful operation
+    res = divide(10.0, 2.0)
 
-    if (res%is\_ok()) then
-        \! Unwrapping returns a polymorphic pointer (class(\*), pointer)
-        \! You must use \`select type\` to access the concrete data.
-        val \=\> res%unwrap()
+    if (res%is_ok()) then
+        ! Unwrapping returns a polymorphic pointer (class(*), pointer)
+        ! You must use `select type` to access the concrete data.
+        val => res%unwrap()
         select type (val)
         type is (real)
-            print \*, "Result is:", val
+            print *, "Result is:", val
         end select
     else
-        \! Handle error
-        val \=\> res%unwrap\_err()
+        ! Handle error
+        val => res%unwrap_err()
         select type (val)
         type is (character(\*))
-            print \*, "Error occurred: ", val
+            print *, "Error occurred: ", val
         end select
     end if
 
-    \! 2\. Failed operation
-    res \= divide(10.0, 0.0)
+    ! 2. Failed operation
+    res = divide(10.0, 0.0)
 
-    \! You can also use unwrap\_or to provide a default value if it failed
-    \! (Note: unwrap\_or returns an allocatable, not a pointer)
-    print \*, "Safe result:", res%unwrap\_or(-1.0)
+    ! You can also use unwrap_or to provide a default value if it failed
+    ! (Note: unwrap_or returns an allocatable, not a pointer)
+    print *, "Safe result:", res%unwrap_or(-1.0)
 
 contains
 
     function divide(n, d) result(r)
         real, intent(in) :: n, d
-        type(result\_type) :: r
+        type(result_type) :: r
 
-        if (d \== 0.0) then
-            r \= err("Division by zero")
+        if (d == 0.0) then
+            r = err("Division by zero")
         else
-            r \= ok(n / d)
+            r = ok(n / d)
         end if
     end function divide
 
-end program demo\_result
+end program demo_result
 ```
 
 ### 2. The Option Type (some / none)
@@ -95,52 +95,52 @@ Use Option when a value might be present or absent (avoiding null pointer except
 numbers like -1).
 
 ```fortran
-program demo\_option
-    use formerr\_option
+program demo_option
+    use formerr_option
     implicit none
 
-    type(option) :: user\_id
+    type(option) :: user_id
     class(\*), pointer :: p
 
-    user\_id \= find\_user("alice")
+    user_id = find_user("alice")
 
-    if (user\_id%is\_some()) then
-        p \=\> user\_id%unwrap()
+    if (user_id%is_some()) then
+        p => user_id%unwrap()
         select type (p)
         type is (integer)
-            print \*, "User ID found:", p
+            print *, "User ID found:", p
         end select
     else
-        print \*, "User not found."
+        print *, "User not found."
     end if
 
-    \! defaults
-    user\_id \= none()
-    \! Returns 0 if none, otherwise the contained value
-    call print\_id(user\_id%unwrap\_or(0))
+    ! defaults
+    user_id = none()
+    ! Returns 0 if none, otherwise the contained value
+    call print_id(user_id%unwrap_or(0))
 
 contains
 
-    function find\_user(name) result(opt)
+    function find_user(name) result(opt)
         character(\*), intent(in) :: name
         type(option) :: opt
 
-        if (name \== "alice") then
-            opt \= some(1234)
+        if (name == "alice") then
+            opt = some(1234)
         else
-            opt \= none()
+            opt = none()
         end if
-    end function find\_user
+    end function find_user
 
-    subroutine print\_id(val)
-        class(\*), intent(in) :: val
+    subroutine print_id(val)
+        class(*), intent(in) :: val
         select type (val)
         type is (integer)
-            print \*, "ID is ", val
+            print *, "ID is ", val
         end select
     end subroutine
 
-end program demo\_option
+end program demo_option
 ```
 
 ## API Reference
@@ -148,32 +148,32 @@ end program demo\_option
 ### formerr_result
 
 - **Constructors**:
-  - ok(val): Creates a success result containing val.
-  - err(val): Creates a failure result containing val.
+  - `ok(val)`: Creates a `success` result containing `val`.
+  - `err(val)`: Creates a `failure` result containing `val`.
 - **Methods**:
-  - is_ok(): Logical. True if success.
-  - is_err(): Logical. True if failure.
-  - unwrap(): Returns class(\*), pointer to the Ok value. Fails if Err.
-  - unwrap_err(): Returns class(\*), pointer to the Err value. Fails if Ok.
-  - unwrap_or(default): Returns class(\*), allocatable. Returns content if Ok, default if Err.
+  - `is_ok()`: Logical. `.TRUE.` if `success`.
+  - `is_err()`: Logical. `.TRUE.` if `failure`.
+  - `unwrap()`: Returns `class(*)`, pointer to the Ok value. Fails if Err.
+  - `unwrap_err()`: Returns `class(*)`, pointer to the Err value. Fails if Ok.
+  - `unwrap_or(default)`: Returns `class(*), allocatable`. Returns content if Ok, default if Err.
 
 ### formerr_option
 
 - **Constructors**:
-  - some(val): Creates an option containing a value.
-  - none(): Creates an empty option.
+  - `some(val)`: Creates an option containing `val`.
+  - `none()`: Creates an empty option.
 - **Methods**:
-  - is_some(): Logical. True if value exists.
-  - is_none(): Logical. True if empty.
-  - unwrap(): Returns class(\*), pointer to the value. Fails if None.
-  - unwrap_or(default): Returns class(\*), allocatable. Returns content if Some, default if None.
+  - `is_some()`: Logical. `.TRUE.` if value exists.
+  - `is_none()`: Logical. `.TRUE.` if empty.
+  - `unwrap()`: Returns `class(*)`, pointer to the value. Fails if None.
+  - `unwrap_or(default)`: Returns `class(*), allocatable`. Returns content if Some, default if None.
 
 ### formerr_either
 
 The base type for Option and Result. Useful for generic "Left vs Right" logic.
 
-- **Constructors**: left(val), right(val).
-- **Methods**: is_left(), is_right(), get_left(), get_right().
+- **Constructors**: `left(val)`, `right(val)`.
+- **Methods**: `is_left()`, `is_right()`, `get_left()`, `get_right()`.
 
 ## Development Environment
 
