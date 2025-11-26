@@ -1,15 +1,216 @@
 # Formerr
 
-Formerr (the FORtran Monadic ERRor system) is a library aiming to bring the benefits of
-functional-style monadic error handling to the fortran ecosystem. Currently, the standard approach
-to error-handling in fortran involves the passing of status codes in a style similar to C or
-golang. While this works it results in a per-function error contract, which can create problems
-in systems where a consistent, predictable, and enforced error handling pattern are required, e.g:
+## The FORtran Monadic ERRor system
 
-- Highly modular systems
-- Lazy executing libraries
-- Distributed systems
+**Formerr** is a Fortran library that brings functional-style monadic error handling to the Fortran
+ecosystem. It provides a robust alternative to the traditional "status code" pattern (e.g., ierr),
+allowing developers to write cleaner, safer, and more predictable code for modular and distributed
+systems.
 
-Formerr aims to solve this by creating a simple error monad for fortran, along with accompanying
-functions and error handling logic to create a clean, consistent, and predictable error handling
-paradigm, more akin to functional languages where these systems are often easier to implement.
+## Why Formerr?
+
+Standard Fortran error handling often relies on passing integer status codes or checking global
+state. This approach can lead to:
+
+- Inconsistent error contracts between functions.
+- "GOTO hell" when handling multiple failure points.
+- Silent failures if status codes are ignored.
+
+**Formerr** introduces the Result, Option, and Either monads—concepts popularized by functional
+languages and modern systems languages like Rust—adapted for Modern Fortran.
+
+## Installation
+
+Formerr is designed to be used with the
+[Fortran Package Manager (fpm)](https://fpm.fortran-lang.org/).
+
+Add the following dependency to your fpm.toml:
+
+```toml
+[dependencies]
+formerr = { git = "https://github.com/cian-h/formerr" }
+```
+
+## Usage
+
+### 1. The Result Type (ok / err)
+
+Use Result when an operation might succeed or fail. It wraps either a success value (Ok) or an
+error value (Err).
+
+```fortran
+program demo\_result
+    use formerr\_result
+    implicit none
+
+    type(result\_type) :: res
+    class(\*), pointer :: val
+
+    \! 1\. Successful operation
+    res \= divide(10.0, 2.0)
+
+    if (res%is\_ok()) then
+        \! Unwrapping returns a polymorphic pointer (class(\*), pointer)
+        \! You must use \`select type\` to access the concrete data.
+        val \=\> res%unwrap()
+        select type (val)
+        type is (real)
+            print \*, "Result is:", val
+        end select
+    else
+        \! Handle error
+        val \=\> res%unwrap\_err()
+        select type (val)
+        type is (character(\*))
+            print \*, "Error occurred: ", val
+        end select
+    end if
+
+    \! 2\. Failed operation
+    res \= divide(10.0, 0.0)
+
+    \! You can also use unwrap\_or to provide a default value if it failed
+    \! (Note: unwrap\_or returns an allocatable, not a pointer)
+    print \*, "Safe result:", res%unwrap\_or(-1.0)
+
+contains
+
+    function divide(n, d) result(r)
+        real, intent(in) :: n, d
+        type(result\_type) :: r
+
+        if (d \== 0.0) then
+            r \= err("Division by zero")
+        else
+            r \= ok(n / d)
+        end if
+    end function divide
+
+end program demo\_result
+```
+
+### 2. The Option Type (some / none)
+
+Use Option when a value might be present or absent (avoiding null pointer exceptions or magic
+numbers like -1).
+
+```fortran
+program demo\_option
+    use formerr\_option
+    implicit none
+
+    type(option) :: user\_id
+    class(\*), pointer :: p
+
+    user\_id \= find\_user("alice")
+
+    if (user\_id%is\_some()) then
+        p \=\> user\_id%unwrap()
+        select type (p)
+        type is (integer)
+            print \*, "User ID found:", p
+        end select
+    else
+        print \*, "User not found."
+    end if
+
+    \! defaults
+    user\_id \= none()
+    \! Returns 0 if none, otherwise the contained value
+    call print\_id(user\_id%unwrap\_or(0))
+
+contains
+
+    function find\_user(name) result(opt)
+        character(\*), intent(in) :: name
+        type(option) :: opt
+
+        if (name \== "alice") then
+            opt \= some(1234)
+        else
+            opt \= none()
+        end if
+    end function find\_user
+
+    subroutine print\_id(val)
+        class(\*), intent(in) :: val
+        select type (val)
+        type is (integer)
+            print \*, "ID is ", val
+        end select
+    end subroutine
+
+end program demo\_option
+```
+
+## API Reference
+
+### formerr_result
+
+- **Constructors**:
+  - ok(val): Creates a success result containing val.
+  - err(val): Creates a failure result containing val.
+- **Methods**:
+  - is_ok(): Logical. True if success.
+  - is_err(): Logical. True if failure.
+  - unwrap(): Returns class(\*), pointer to the Ok value. Fails if Err.
+  - unwrap_err(): Returns class(\*), pointer to the Err value. Fails if Ok.
+  - unwrap_or(default): Returns class(\*), allocatable. Returns content if Ok, default if Err.
+
+### formerr_option
+
+- **Constructors**:
+  - some(val): Creates an option containing a value.
+  - none(): Creates an empty option.
+- **Methods**:
+  - is_some(): Logical. True if value exists.
+  - is_none(): Logical. True if empty.
+  - unwrap(): Returns class(\*), pointer to the value. Fails if None.
+  - unwrap_or(default): Returns class(\*), allocatable. Returns content if Some, default if None.
+
+### formerr_either
+
+The base type for Option and Result. Useful for generic "Left vs Right" logic.
+
+- **Constructors**: left(val), right(val).
+- **Methods**: is_left(), is_right(), get_left(), get_right().
+
+## Development Environment
+
+This project supports **Nix** and **devenv** for a reproducible development environment.
+
+1. Install [Nix](https://nixos.org/download.html).
+
+1. Install [direnv](https://direnv.net/).
+
+1. Enter the directory and allow the environment:
+
+   ```sh
+   direnv allow
+   ```
+
+   This will automatically install gfortran, fortls (Language Server), fpm, and formatting tools
+   defined in devenv.nix.
+
+### Running Tests
+
+To run the test suite (powered by test-drive):
+
+```sh
+fortran-fpm test
+```
+
+## License
+
+This project is licensed under the MIT License - see the
+[LICENSE.md](http://docs.google.com/LICENSE.md) file for details.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository.
+1. Create your feature branch (`git checkout -b feature/AmazingFeature`).
+1. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
+1. Push to the branch (`git push origin feature/AmazingFeature`).
+1. Open a Pull Request.
