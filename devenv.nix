@@ -6,6 +6,7 @@
   ...
 }: {
   packages = [
+    pkgs.gfortran
     pkgs.git
     pkgs.fortls
     pkgs.fortran-fpm
