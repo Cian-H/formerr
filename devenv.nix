@@ -9,6 +9,7 @@
     pkgs.git
     pkgs.fortls
     pkgs.fortran-fpm
+    pkgs.fprettify
   ];
 
   languages.fortran.enable = true;
