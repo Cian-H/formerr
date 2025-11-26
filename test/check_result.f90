@@ -6,7 +6,7 @@ module result_tests
 
     public :: test_ok_integer, test_err_string, &
               test_unwrap_logic, test_unwrap_err_logic, &
-              test_unwrap_or_logic
+              test_unwrap_or_logic, test_nested_containers
 
 contains
 
@@ -119,6 +119,35 @@ contains
         end select
     end subroutine test_unwrap_or_logic
 
+    subroutine test_nested_containers(error)
+        use formerr_option, only: some, option
+        type(error_type), allocatable, intent(out) :: error
+        type(result_type) :: res
+        type(option) :: opt_in
+        class(*), pointer :: outer_ptr, inner_ptr
+
+        opt_in = some(100)
+        res = ok(opt_in)
+
+        outer_ptr => res%unwrap()
+
+        select type (outer_ptr)
+        type is (option)
+            call check(error, outer_ptr%is_some(), "Inner option should be Some")
+
+            inner_ptr => outer_ptr%unwrap()
+            select type (inner_ptr)
+            type is (integer)
+                call check(error, inner_ptr == 100, "Nested value mismatch")
+            class default
+                call check(error, .false., "Failed to unwrap nested Integer")
+            end select
+
+        class default
+            call check(error, .false., "Failed to unwrap nested Option")
+        end select
+    end subroutine test_nested_containers
+
 end module result_tests
 
 module result_suite
@@ -139,7 +168,8 @@ contains
                     new_unittest("err_string", test_err_string), &
                     new_unittest("unwrap_logic", test_unwrap_logic), &
                     new_unittest("unwrap_err_logic", test_unwrap_err_logic), &
-                    new_unittest("unwrap_or_logic", test_unwrap_or_logic) &
+                    new_unittest("unwrap_or_logic", test_unwrap_or_logic), &
+                    new_unittest("nested_containers", test_nested_containers) &
                     ]
 
     end subroutine collect_result_suite

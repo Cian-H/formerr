@@ -4,8 +4,14 @@ module option_tests
     implicit none
     private
 
+    type :: custom_type
+        integer :: id
+        real :: value
+    end type custom_type
+
     public :: test_some_integer, test_none_behavior, &
-              test_unwrap_or_logic, test_string_option
+              test_unwrap_or_logic, test_unwrap_or_copy_semantics, &
+              test_string_option, test_custom_type
 
 contains
 
@@ -76,6 +82,27 @@ contains
         end select
     end subroutine test_unwrap_or_logic
 
+    subroutine test_unwrap_or_copy_semantics(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(option) :: opt
+        class(*), allocatable :: res
+
+        opt = some(10)
+        res = opt%unwrap_or(0)
+
+        select type (res)
+        type is (integer)
+            ! Modify the result
+            res = 50
+        end select
+
+        ! Verify original is untouched
+        select type (orig => opt%unwrap())
+        type is (integer)
+            call check(error, orig == 10, "Original value was modified by unwrap_or result!")
+        end select
+    end subroutine test_unwrap_or_copy_semantics
+
     subroutine test_string_option(error)
         type(error_type), allocatable, intent(out) :: error
         type(option) :: opt
@@ -91,6 +118,26 @@ contains
             call check(error, .false., "Expected character type")
         end select
     end subroutine test_string_option
+
+    subroutine test_custom_type(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(option) :: opt
+        class(*), pointer :: p
+        type(custom_type) :: input_val
+
+        input_val = custom_type(99, 1.23)
+        opt = some(input_val)
+
+        p => opt%unwrap()
+
+        select type (p)
+        type is (custom_type)
+            call check(error, p%id == 99, "Custom type ID mismatch")
+            call check(error, abs(p%value - 1.23) < 1e-5, "Custom type Value mismatch")
+        class default
+            call check(error, .false., "Failed to recover custom derived type")
+        end select
+    end subroutine test_custom_type
 
 end module option_tests
 
@@ -111,7 +158,9 @@ contains
                     new_unittest("some_integer", test_some_integer), &
                     new_unittest("none_behavior", test_none_behavior), &
                     new_unittest("unwrap_or_logic", test_unwrap_or_logic), &
-                    new_unittest("string_option", test_string_option) &
+                    new_unittest("unwrap_or_copy_semantics", test_unwrap_or_copy_semantics), &
+                    new_unittest("string_option", test_string_option), &
+                    new_unittest("custom_type", test_custom_type) &
                     ]
 
     end subroutine collect_option_suite
