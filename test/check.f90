@@ -3,6 +3,7 @@ program check
   use testdrive, only : run_testsuite, new_testsuite, testsuite_type
   use either_suite, only : collect_either_suite
   use option_suite, only : collect_option_suite
+  use result_suite, only : collect_result_suite
   implicit none
   integer :: stat, is
   type(testsuite_type), allocatable :: testsuites(:)
@@ -12,7 +13,8 @@ program check
 
   testsuites = [ &
     new_testsuite("either_suite", collect_either_suite), &
-    new_testsuite("option_suite", collect_option_suite) &
+    new_testsuite("option_suite", collect_option_suite), &
+    new_testsuite("result_suite", collect_result_suite) &
     ]
 
   do is = 1, size(testsuites)
