@@ -61,7 +61,7 @@ program demo_result
         ! Handle error
         val => res%unwrap_err()
         select type (val)
-        type is (character(\*))
+        type is (character(*))
             print *, "Error occurred: ", val
         end select
     end if
@@ -100,7 +100,7 @@ program demo_option
     implicit none
 
     type(option) :: user_id
-    class(\*), pointer :: p
+    class(*), pointer :: p
 
     user_id = find_user("alice")
 
@@ -122,7 +122,7 @@ program demo_option
 contains
 
     function find_user(name) result(opt)
-        character(\*), intent(in) :: name
+        character(*), intent(in) :: name
         type(option) :: opt
 
         if (name == "alice") then
