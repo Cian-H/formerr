@@ -58,9 +58,9 @@ contains
 
         if (this%is_some()) then
             ptr => this%get_right()
-            allocate(res, source=ptr)
+            allocate (res, source=ptr)
         else
-            allocate(res, source=default_val)
+            allocate (res, source=default_val)
         end if
     end function unwrap_or
 

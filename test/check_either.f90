@@ -98,11 +98,11 @@ contains
         type(unittest_type), allocatable, intent(out) :: testsuite(:)
 
         testsuite = [ &
-                 new_unittest("integer_left", test_integer_left), &
-                 new_unittest("real_right", test_real_right), &
-                 new_unittest("string_logic", test_string_logic), &
-                 new_unittest("generic_constructor", test_generic_constructor) &
-                 ]
+                    new_unittest("integer_left", test_integer_left), &
+                    new_unittest("real_right", test_real_right), &
+                    new_unittest("string_logic", test_string_logic), &
+                    new_unittest("generic_constructor", test_generic_constructor) &
+                    ]
 
     end subroutine collect_either_suite
 

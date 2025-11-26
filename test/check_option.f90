@@ -19,7 +19,7 @@ contains
         call check(error, opt%is_some(), "some(42) should be is_some()")
         if (allocated(error)) return
 
-        call check(error, .not. opt%is_none(), "some(42) should not be is_none()")
+        call check(error,.not. opt%is_none(), "some(42) should not be is_none()")
         if (allocated(error)) return
 
         p => opt%unwrap()
@@ -44,7 +44,7 @@ contains
         call check(error, opt%is_none(), "none() should be is_none()")
         if (allocated(error)) return
 
-        call check(error, .not. opt%is_some(), "none() should not be is_some()")
+        call check(error,.not. opt%is_some(), "none() should not be is_some()")
         if (allocated(error)) return
 
     end subroutine test_none_behavior
@@ -108,11 +108,11 @@ contains
         type(unittest_type), allocatable, intent(out) :: testsuite(:)
 
         testsuite = [ &
-            new_unittest("some_integer", test_some_integer), &
-            new_unittest("none_behavior", test_none_behavior), &
-            new_unittest("unwrap_or_logic", test_unwrap_or_logic), &
-            new_unittest("string_option", test_string_option) &
-        ]
+                    new_unittest("some_integer", test_some_integer), &
+                    new_unittest("none_behavior", test_none_behavior), &
+                    new_unittest("unwrap_or_logic", test_unwrap_or_logic), &
+                    new_unittest("string_option", test_string_option) &
+                    ]
 
     end subroutine collect_option_suite
 
