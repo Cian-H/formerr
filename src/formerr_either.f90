@@ -1,4 +1,4 @@
-module either_mod
+module formerr_either
     implicit none
     private
 
@@ -80,4 +80,4 @@ contains
         if (allocated(this%r_val)) ptr => this%r_val
     end function get_right
 
-end module either_mod
+end module formerr_either

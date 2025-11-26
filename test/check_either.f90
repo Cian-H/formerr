@@ -1,6 +1,6 @@
 module either_tests
     use testdrive, only: new_unittest, check, error_type
-    use either_mod
+    use formerr_either
     implicit none
 
 contains
