@@ -1,0 +1,23 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    name: Test Library
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+      - name: Setup Cachix for Devenv
+        uses: cachix/cachix-action@v16
+        with:
+          name: devenv
+      - name: Build Shell & Run Linters
+        run: devenv test
+      - name: Run Fortran Tests
+        run: devenv shell -- fortran-fpm test
