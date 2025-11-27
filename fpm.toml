@@ -25,3 +25,8 @@ stdlib = "*"
 
 [dev-dependencies]
 test-drive = { git = "https://github.com/fortran-lang/test-drive", tag = "v0.5.0" }
+
+[[test]]
+name = "bench"
+source-dir = "bench"
+main = "main.f90"

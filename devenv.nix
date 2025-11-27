@@ -23,4 +23,6 @@
     taplo.enable = true;
     yamlfmt.enable = true;
   };
+
+  scripts.run-bench.exec = "fortran-fpm test bench --profile release";
 }
