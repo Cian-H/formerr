@@ -50,3 +50,5 @@ devenv.local.yaml
 
 # debug information files
 *.dwo
+
+bench.csv
