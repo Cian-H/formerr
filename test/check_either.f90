@@ -10,7 +10,7 @@ contains
         type(either) :: e
         class(*), pointer :: p
 
-        e = left(42)
+        e = new_left(42)
 
         call check(error, e%is_left(), "is_left() should be true")
         if (allocated(error)) return
@@ -35,7 +35,7 @@ contains
         type(either) :: e
         class(*), pointer :: p
 
-        e = right(3.14)
+        e = new_right(3.14)
 
         call check(error, e%is_right(), "is_right() should be true")
         if (allocated(error)) return
@@ -59,7 +59,7 @@ contains
         type(either) :: e
         class(*), pointer :: p
 
-        e = left("Fortran")
+        e = new_left("Fortran")
         p => e%get_left()
 
         select type (p)

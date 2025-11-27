@@ -2,7 +2,7 @@ module formerr_either
     implicit none
     private
 
-    public :: either, left, right
+    public :: either, new_left, new_right
 
     type :: either
         private
@@ -14,6 +14,12 @@ module formerr_either
 
         procedure :: get_left
         procedure :: get_right
+
+        procedure :: set_left
+        procedure :: set_right
+
+        procedure :: move_left
+        procedure :: move_right
     end type either
 
     interface either
@@ -28,29 +34,25 @@ contains
 
         ! Validation: Ensure strict XOR logic
         if (present(left_val) .and. .not. present(right_val)) then
-            res = left(left_val)
+            res = new_left(left_val)
         else if (present(right_val) .and. .not. present(left_val)) then
-            res = right(right_val)
+            res = new_right(right_val)
         else
             error stop "either constructor requires exactly one argument (left=... OR right=...)"
         end if
     end function new_either
 
-    function left(val) result(res)
+    function new_left(val) result(res)
         class(*), intent(in) :: val
         type(either) :: res
+        call res%set_left(val)
+    end function new_left
 
-        ! Enforce invariant: allocate left, ensure right is dead
-        allocate (res%l_val, source=val)
-    end function left
-
-    function right(val) result(res)
+    function new_right(val) result(res)
         class(*), intent(in) :: val
         type(either) :: res
-
-        ! Enforce invariant: allocate right, ensure left is dead
-        allocate (res%r_val, source=val)
-    end function right
+        call res%set_right(val)
+    end function new_right
 
     logical function is_left(this)
         class(either), intent(in) :: this
@@ -79,5 +81,37 @@ contains
         ptr => null()
         if (allocated(this%r_val)) ptr => this%r_val
     end function get_right
+
+    subroutine set_left(this, val)
+        class(either), intent(inout) :: this
+        class(*), intent(in) :: val
+        if (allocated(this%r_val)) deallocate(this%r_val)
+        if (allocated(this%l_val)) deallocate(this%l_val)
+        allocate (this%l_val, source=val)
+    end subroutine set_left
+
+    subroutine set_right(this, val)
+        class(either), intent(inout) :: this
+        class(*), intent(in) :: val
+        if (allocated(this%l_val)) deallocate(this%l_val)
+        if (allocated(this%r_val)) deallocate(this%r_val)
+        allocate (this%r_val, source=val)
+    end subroutine set_right
+
+    subroutine move_left(this, val)
+        class(either), intent(inout) :: this
+        class(*), allocatable, intent(inout) :: val
+        if (allocated(this%r_val)) deallocate(this%r_val)
+        if (allocated(this%l_val)) deallocate(this%l_val)
+        call move_alloc(from=val, to=this%l_val)
+    end subroutine move_left
+
+    subroutine move_right(this, val)
+        class(either), intent(inout) :: this
+        class(*), allocatable, intent(inout) :: val
+        if (allocated(this%l_val)) deallocate(this%l_val)
+        if (allocated(this%r_val)) deallocate(this%r_val)
+        call move_alloc(from=val, to=this%r_val)
+    end subroutine move_right
 
 end module formerr_either

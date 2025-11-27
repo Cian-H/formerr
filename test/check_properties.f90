@@ -2,7 +2,7 @@ module property_tests
     use testdrive, only: new_unittest, check, error_type
     use formerr_option, only: option, some, none
     use formerr_result, only: result_type, ok, err
-    use formerr_either, only: either, left, right
+    use formerr_either, only: either, new_left, new_right
     implicit none
     private
 
@@ -145,7 +145,7 @@ contains
             call random_number(val)
 
             ! --- Test Left ---
-            e = left(val)
+            e = new_left(val)
 
             call check(error, e%is_left(), "Property failed: left(x) is not is_left")
             if (allocated(error)) return
@@ -163,7 +163,7 @@ contains
             end select
 
             ! --- Test Right ---
-            e = right(val)
+            e = new_right(val)
 
             call check(error, e%is_right(), "Property failed: right(x) is not is_right")
             if (allocated(error)) return

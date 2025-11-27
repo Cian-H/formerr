@@ -5,6 +5,7 @@ module formerr_result
     private
 
     public :: result_type, ok, err, is_ok, is_err, unwrap, unwrap_err, unwrap_or
+    public :: ok_move, err_move, unwrap_move_to_err, unsafe_unwrap_move
 
     type, extends(either) :: result_type
     contains
@@ -13,6 +14,8 @@ module formerr_result
         procedure :: unwrap
         procedure :: unwrap_err
         procedure :: unwrap_or
+        procedure :: unwrap_move_to_err
+        procedure :: unsafe_unwrap_move
     end type result_type
 
 contains
@@ -20,14 +23,26 @@ contains
     function ok(val) result(res)
         class(*), intent(in) :: val
         type(result_type) :: res
-        res%either = right(val)
+        call res%set_right(val)
     end function ok
 
     function err(val) result(res)
         class(*), intent(in) :: val
         type(result_type) :: res
-        res%either = left(val)
+        call res%set_left(val)
     end function err
+
+    function ok_move(val) result(res)
+        class(*), allocatable, intent(inout) :: val
+        type(result_type) :: res
+        call res%move_right(val)
+    end function ok_move
+
+    function err_move(val) result(res)
+        class(*), allocatable, intent(inout) :: val
+        type(result_type) :: res
+        call res%move_left(val)
+    end function err_move
 
     logical function is_ok(this)
         class(result_type), intent(in) :: this
@@ -70,5 +85,39 @@ contains
             allocate (res, source=default_val)
         end if
     end function unwrap_or
+
+    !> Extracts the Ok value by moving it to 'dest', and replacing it with 'replacement_err'.
+    !> This ensures the Result object remains valid (now containing an Err).
+    subroutine unwrap_move_to_err(this, dest, replacement_err)
+        class(result_type), intent(inout) :: this
+        class(*), allocatable, intent(out) :: dest
+        class(*), intent(in) :: replacement_err
+        class(*), allocatable :: temp_err
+
+        call check(this%is_ok(), "unwrap_move_to_err called on Err value")
+
+        ! 1. Allocate the replacement error first to ensure safety if alloc fails
+        allocate(temp_err, source=replacement_err)
+
+        ! 2. Perform the swap
+        ! Move the Right (Ok) value to dest (leaves Right unallocated)
+        call this%move_right(dest)
+
+        ! 3. Restore invariant: Move the temp error into Left
+        call this%move_left(temp_err)
+    end subroutine unwrap_move_to_err
+
+    subroutine unsafe_unwrap_move(this, dest)
+        class(result_type), intent(inout) :: this
+        class(*), allocatable, intent(out) :: dest
+
+        call check(this%is_ok(), "unsafe_unwrap_move called on Err value")
+
+        ! Zero-cost pointer swap. No allocations.
+        call this%move_right(dest)
+
+        ! 'this' is now a Zombie (Left=Unallocated, Right=Unallocated).
+        ! This breaks our safety contract, but this move is *very* fast
+    end subroutine unsafe_unwrap_move
 
 end module formerr_result

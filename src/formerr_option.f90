@@ -4,7 +4,8 @@ module formerr_option
     implicit none
     private
 
-    public :: option, some, none, is_some, is_none, unwrap
+    public :: option, some, none, is_some, is_none, unwrap, unwrap_or
+    public :: some_move, unwrap_move
 
     type :: unit_type
     end type unit_type
@@ -15,6 +16,7 @@ module formerr_option
         procedure :: is_none
         procedure :: unwrap
         procedure :: unwrap_or
+        procedure :: unwrap_move
     end type option
 
 contains
@@ -22,14 +24,20 @@ contains
     function some(val) result(res)
         class(*), intent(in) :: val
         type(option) :: res
-        res%either = right(val)
+        call res%set_right(val)
     end function some
 
     function none() result(res)
         type(option) :: res
         type(unit_type) :: u
-        res%either = left(u)
+        call res%set_left(u)
     end function none
+
+    function some_move(val) result(res)
+        class(*), allocatable, intent(inout) :: val
+        type(option) :: res
+        call res%move_right(val)
+    end function some_move
 
     logical function is_some(this)
         class(option), intent(in) :: this
@@ -63,5 +71,26 @@ contains
             allocate (res, source=default_val)
         end if
     end function unwrap_or
+
+    !> Extracts the value by moving it to 'dest'.
+    !> The Option immediately becomes None.
+    subroutine unwrap_move(this, dest)
+        class(option), intent(inout) :: this
+        class(*), allocatable, intent(out) :: dest
+        type(unit_type) :: u
+        class(*), allocatable :: temp_none
+
+        call check(this%is_some(), "unwrap_move called on None value")
+
+        ! 1. Prepare the None state (Unit type)
+        allocate(temp_none, source=u)
+
+        ! 2. Perform the swap
+        ! Move the Right (Some) value to dest
+        call this%move_right(dest)
+
+        ! 3. Restore invariant: Move the unit type into Left (None)
+        call this%move_left(temp_none)
+    end subroutine unwrap_move
 
 end module formerr_option
