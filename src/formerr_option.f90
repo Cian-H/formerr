@@ -1,11 +1,22 @@
 module formerr_option
     use formerr_either
     use stdlib_error, only: check
+    use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, real64
     implicit none
     private
 
     public :: option, some, none, is_some, is_none, unwrap, unwrap_or
     public :: some_move, unwrap_move
+        public :: some_int
+    public :: some_i8
+    public :: some_i16
+    public :: some_i64
+    public :: some_real
+    public :: some_r64
+    public :: some_log
+    public :: some_cpx
+    public :: some_c64
+
 
     type :: unit_type
     end type unit_type
@@ -17,6 +28,16 @@ module formerr_option
         procedure :: unwrap
         procedure :: unwrap_or
         procedure :: unwrap_move
+                procedure :: unwrap_int
+        procedure :: unwrap_i8
+        procedure :: unwrap_i16
+        procedure :: unwrap_i64
+        procedure :: unwrap_real
+        procedure :: unwrap_r64
+        procedure :: unwrap_log
+        procedure :: unwrap_cpx
+        procedure :: unwrap_c64
+
     end type option
 
 contains
@@ -92,5 +113,134 @@ contains
         ! 3. Restore invariant: Move the unit type into Left (None)
         call this%move_left(temp_none)
     end subroutine unwrap_move
+
+    ! -- Specialized Implementations --
+    
+    function some_int(val) result(res)
+        integer, intent(in) :: val
+        type(option) :: res
+        call res%set_right_int(val)
+    end function some_int
+
+    function unwrap_int(this) result(val)
+        class(option), intent(in) :: this
+        integer :: val
+        if (this%is_none()) error stop "unwrap_int called on None value"
+        ! We call the specialized getter from either
+        val = this%get_right_int()
+    end function unwrap_int
+
+    function some_i8(val) result(res)
+        integer(int8), intent(in) :: val
+        type(option) :: res
+        call res%set_right_i8(val)
+    end function some_i8
+
+    function unwrap_i8(this) result(val)
+        class(option), intent(in) :: this
+        integer(int8) :: val
+        if (this%is_none()) error stop "unwrap_i8 called on None value"
+        ! We call the specialized getter from either
+        val = this%get_right_i8()
+    end function unwrap_i8
+
+    function some_i16(val) result(res)
+        integer(int16), intent(in) :: val
+        type(option) :: res
+        call res%set_right_i16(val)
+    end function some_i16
+
+    function unwrap_i16(this) result(val)
+        class(option), intent(in) :: this
+        integer(int16) :: val
+        if (this%is_none()) error stop "unwrap_i16 called on None value"
+        ! We call the specialized getter from either
+        val = this%get_right_i16()
+    end function unwrap_i16
+
+    function some_i64(val) result(res)
+        integer(int64), intent(in) :: val
+        type(option) :: res
+        call res%set_right_i64(val)
+    end function some_i64
+
+    function unwrap_i64(this) result(val)
+        class(option), intent(in) :: this
+        integer(int64) :: val
+        if (this%is_none()) error stop "unwrap_i64 called on None value"
+        ! We call the specialized getter from either
+        val = this%get_right_i64()
+    end function unwrap_i64
+
+    function some_real(val) result(res)
+        real, intent(in) :: val
+        type(option) :: res
+        call res%set_right_real(val)
+    end function some_real
+
+    function unwrap_real(this) result(val)
+        class(option), intent(in) :: this
+        real :: val
+        if (this%is_none()) error stop "unwrap_real called on None value"
+        ! We call the specialized getter from either
+        val = this%get_right_real()
+    end function unwrap_real
+
+    function some_r64(val) result(res)
+        real(real64), intent(in) :: val
+        type(option) :: res
+        call res%set_right_r64(val)
+    end function some_r64
+
+    function unwrap_r64(this) result(val)
+        class(option), intent(in) :: this
+        real(real64) :: val
+        if (this%is_none()) error stop "unwrap_r64 called on None value"
+        ! We call the specialized getter from either
+        val = this%get_right_r64()
+    end function unwrap_r64
+
+    function some_log(val) result(res)
+        logical, intent(in) :: val
+        type(option) :: res
+        call res%set_right_log(val)
+    end function some_log
+
+    function unwrap_log(this) result(val)
+        class(option), intent(in) :: this
+        logical :: val
+        if (this%is_none()) error stop "unwrap_log called on None value"
+        ! We call the specialized getter from either
+        val = this%get_right_log()
+    end function unwrap_log
+
+    function some_cpx(val) result(res)
+        complex, intent(in) :: val
+        type(option) :: res
+        call res%set_right_cpx(val)
+    end function some_cpx
+
+    function unwrap_cpx(this) result(val)
+        class(option), intent(in) :: this
+        complex :: val
+        if (this%is_none()) error stop "unwrap_cpx called on None value"
+        ! We call the specialized getter from either
+        val = this%get_right_cpx()
+    end function unwrap_cpx
+
+    function some_c64(val) result(res)
+        complex(real64), intent(in) :: val
+        type(option) :: res
+        call res%set_right_c64(val)
+    end function some_c64
+
+    function unwrap_c64(this) result(val)
+        class(option), intent(in) :: this
+        complex(real64) :: val
+        if (this%is_none()) error stop "unwrap_c64 called on None value"
+        ! We call the specialized getter from either
+        val = this%get_right_c64()
+    end function unwrap_c64
+
 
 end module formerr_option

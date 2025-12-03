@@ -1,0 +1,201 @@
+module formerr_either
+    use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, real64
+    implicit none
+    private
+
+    public :: either, new_left, new_right
+    {public_procedures}
+
+    ! Type constants
+    integer, parameter :: TYPE_NONE = 0
+    integer, parameter :: TYPE_DYN = 1
+    {type_constants}
+
+    type :: either
+        private
+        integer :: active_l = TYPE_NONE
+        integer :: active_r = TYPE_NONE
+
+        ! Dynamic fallback
+        class(*), allocatable :: l_val_dyn
+        class(*), allocatable :: r_val_dyn
+
+        ! Monomorphised storage (embedded, non-allocatable)
+        {type_fields}
+    contains
+        procedure :: is_left
+        procedure :: is_right
+
+        procedure :: get_left
+        procedure :: get_right
+
+        procedure :: set_left
+        procedure :: set_right
+
+        procedure :: move_left
+        procedure :: move_right
+
+        ! Helper to clear internal state
+        procedure, private :: clear_left
+        procedure, private :: clear_right
+
+        ! Specialized Procedures
+        {type_bound_procedures}
+    end type either
+
+    interface either
+        module procedure new_either
+    end interface
+
+contains
+
+    function new_either(left_val, right_val) result(res)
+        class(*), intent(in), optional :: left_val
+        class(*), intent(in), optional :: right_val
+        type(either) :: res
+
+        if (present(left_val) .and. .not. present(right_val)) then
+            res = new_left(left_val)
+        else if (present(right_val) .and. .not. present(left_val)) then
+            res = new_right(right_val)
+        else
+            error stop "either constructor requires exactly one argument"
+        end if
+    end function new_either
+
+    function new_left(val) result(res)
+        class(*), intent(in) :: val
+        type(either) :: res
+        call res%set_left(val)
+    end function new_left
+
+    function new_right(val) result(res)
+        class(*), intent(in) :: val
+        type(either) :: res
+        call res%set_right(val)
+    end function new_right
+
+    logical function is_left(this)
+        class(either), intent(in) :: this
+        is_left = (this%active_l /= TYPE_NONE)
+    end function is_left
+
+    logical function is_right(this)
+        class(either), intent(in) :: this
+        is_right = (this%active_r /= TYPE_NONE)
+    end function is_right
+
+    subroutine clear_left(this)
+        class(either), intent(inout) :: this
+        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
+        ! Monomorphised fields are embedded, no deallocation needed
+        this%active_l = TYPE_NONE
+    end subroutine clear_left
+
+    subroutine clear_right(this)
+        class(either), intent(inout) :: this
+        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        ! Monomorphised fields are embedded, no deallocation needed
+        this%active_r = TYPE_NONE
+    end subroutine clear_right
+
+    function get_left(this) result(ptr)
+        class(either), intent(in), target :: this
+        class(*), pointer :: ptr
+
+        ptr => null()
+        select case (this%active_l)
+        case (TYPE_DYN)
+            if (allocated(this%l_val_dyn)) ptr => this%l_val_dyn
+        {get_left_cases}
+        end select
+    end function get_left
+
+    function get_right(this) result(ptr)
+        class(either), intent(in), target :: this
+        class(*), pointer :: ptr
+
+        ptr => null()
+        select case (this%active_r)
+        case (TYPE_DYN)
+            if (allocated(this%r_val_dyn)) ptr => this%r_val_dyn
+        {get_right_cases}
+        end select
+    end function get_right
+
+    subroutine set_left(this, val)
+        class(either), intent(inout) :: this
+        class(*), intent(in) :: val
+
+        ! Clear both sides (either is exclusive)
+        call this%clear_left()
+        call this%clear_right()
+
+        select type(val)
+        {set_left_cases}
+        class default
+            allocate(this%l_val_dyn, source=val)
+            this%active_l = TYPE_DYN
+        end select
+    end subroutine set_left
+
+    subroutine set_right(this, val)
+        class(either), intent(inout) :: this
+        class(*), intent(in) :: val
+
+        call this%clear_left()
+        call this%clear_right()
+
+        select type(val)
+        {set_right_cases}
+        class default
+            allocate(this%r_val_dyn, source=val)
+            this%active_r = TYPE_DYN
+        end select
+    end subroutine set_right
+
+    subroutine move_left(this, val)
+        class(either), intent(inout) :: this
+        class(*), allocatable, intent(inout) :: val
+
+        call this%clear_left()
+        call this%clear_right()
+
+        ! If val is not allocated, do nothing (or error?)
+        if (.not. allocated(val)) return
+
+        select type(val)
+        {move_left_cases}
+        class default
+            call move_alloc(from=val, to=this%l_val_dyn)
+            this%active_l = TYPE_DYN
+        end select
+
+        ! Deallocate source 'val' if it was allocated (and not moved via move_alloc)
+        if (allocated(val)) deallocate(val)
+
+    end subroutine move_left
+
+    subroutine move_right(this, val)
+        class(either), intent(inout) :: this
+        class(*), allocatable, intent(inout) :: val
+
+        call this%clear_left()
+        call this%clear_right()
+
+        if (.not. allocated(val)) return
+
+        select type(val)
+        {move_right_cases}
+        class default
+            call move_alloc(from=val, to=this%r_val_dyn)
+            this%active_r = TYPE_DYN
+        end select
+
+        if (allocated(val)) deallocate(val)
+    end subroutine move_right
+
+    ! -- Specialized Implementations --
+    {specialized_impls}
+
+end module formerr_either

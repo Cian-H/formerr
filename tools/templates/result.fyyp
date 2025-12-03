@@ -1,0 +1,129 @@
+module formerr_result
+    use formerr_either
+    use stdlib_error, only: check
+    use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, real64
+    implicit none
+    private
+
+    public :: result_type, ok, err, is_ok, is_err, unwrap, unwrap_err, unwrap_or
+    public :: ok_move, err_move, unwrap_move_to_err, unsafe_unwrap_move
+    {public_procedures}
+
+    type, extends(either) :: result_type
+    contains
+        procedure :: is_ok
+        procedure :: is_err
+        procedure :: unwrap
+        procedure :: unwrap_err
+        procedure :: unwrap_or
+        procedure :: unwrap_move_to_err
+        procedure :: unsafe_unwrap_move
+        {type_bound_procedures}
+    end type result_type
+
+contains
+
+    function ok(val) result(res)
+        class(*), intent(in) :: val
+        type(result_type) :: res
+        call res%set_right(val)
+    end function ok
+
+    function err(val) result(res)
+        class(*), intent(in) :: val
+        type(result_type) :: res
+        call res%set_left(val)
+    end function err
+
+    function ok_move(val) result(res)
+        class(*), allocatable, intent(inout) :: val
+        type(result_type) :: res
+        call res%move_right(val)
+    end function ok_move
+
+    function err_move(val) result(res)
+        class(*), allocatable, intent(inout) :: val
+        type(result_type) :: res
+        call res%move_left(val)
+    end function err_move
+
+    logical function is_ok(this)
+        class(result_type), intent(in) :: this
+        is_ok = this%is_right()
+    end function is_ok
+
+    logical function is_err(this)
+        class(result_type), intent(in) :: this
+        is_err = this%is_left()
+    end function is_err
+
+    function unwrap(this) result(ptr)
+        class(result_type), intent(in), target :: this
+        class(*), pointer :: ptr
+
+        call check(this%is_ok(), "unwrap called on Err value")
+
+        ptr => this%get_right()
+    end function unwrap
+
+    function unwrap_err(this) result(ptr)
+        class(result_type), intent(in), target :: this
+        class(*), pointer :: ptr
+
+        call check(this%is_err(), "unwrap_err called on Ok value")
+
+        ptr => this%get_left()
+    end function unwrap_err
+
+    function unwrap_or(this, default_val) result(res)
+        class(result_type), intent(in) :: this
+        class(*), intent(in) :: default_val
+        class(*), allocatable :: res
+        class(*), pointer :: ptr
+
+        if (this%is_ok()) then
+            ptr => this%get_right()
+            allocate (res, source=ptr)
+        else
+            allocate (res, source=default_val)
+        end if
+    end function unwrap_or
+
+    !> Extracts the Ok value by moving it to 'dest', and replacing it with 'replacement_err'.
+    !> This ensures the Result object remains valid (now containing an Err).
+    subroutine unwrap_move_to_err(this, dest, replacement_err)
+        class(result_type), intent(inout) :: this
+        class(*), allocatable, intent(out) :: dest
+        class(*), intent(in) :: replacement_err
+        class(*), allocatable :: temp_err
+
+        call check(this%is_ok(), "unwrap_move_to_err called on Err value")
+
+        ! 1. Allocate the replacement error first to ensure safety if alloc fails
+        allocate(temp_err, source=replacement_err)
+
+        ! 2. Perform the swap
+        ! Move the Right (Ok) value to dest (leaves Right unallocated)
+        call this%move_right(dest)
+
+        ! 3. Restore invariant: Move the temp error into Left
+        call this%move_left(temp_err)
+    end subroutine unwrap_move_to_err
+
+    subroutine unsafe_unwrap_move(this, dest)
+        class(result_type), intent(inout) :: this
+        class(*), allocatable, intent(out) :: dest
+
+        call check(this%is_ok(), "unsafe_unwrap_move called on Err value")
+
+        ! Zero-cost pointer swap. No allocations.
+        call this%move_right(dest)
+
+        ! 'this' is now a Zombie (Left=Unallocated, Right=Unallocated).
+        ! This breaks our safety contract, but this move is *very* fast
+    end subroutine unsafe_unwrap_move
+
+    ! -- Specialized Implementations --
+    {specialized_impls}
+
+end module formerr_result

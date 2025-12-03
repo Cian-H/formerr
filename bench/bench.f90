@@ -1,6 +1,6 @@
 program benchmark
     use, intrinsic :: iso_fortran_env, only: int64, real64
-    use formerr_result, only: result_type, ok, err
+    use formerr_result, only: result_type, ok, err, ok_int
     use formerr_option, only: option, some, none
     implicit none
 
@@ -22,14 +22,32 @@ program benchmark
     t_native = real(t_end - t_start, real64)/real(t_rate, real64)
     print '(A, F10.9, A)', "Native Fortran (Status): ", t_native, " s"
 
-    ! 2. Formerr: Result Type
+    ! 2. Formerr: Result Type (Generic)
     call system_clock(t_start)
     call bench_result_success(ITERATIONS)
     call system_clock(t_end)
     t_formerr = real(t_end - t_start, real64)/real(t_rate, real64)
-    print '(A, F10.9, A)', "Formerr (Result Type):   ", t_formerr, " s"
+    print '(A, F10.9, A)', "Formerr (Generic):       ", t_formerr, " s"
 
-    print '(A, F12.2, A)', "Overhead factor:         ", t_formerr/t_native, "x"
+    print '(A, F12.2, A)', "Overhead (Generic):      ", t_formerr/t_native, "x"
+
+    ! 3. Formerr: Result Type (Specialized Unwrap)
+    call system_clock(t_start)
+    call bench_result_specialized(ITERATIONS)
+    call system_clock(t_end)
+    t_formerr = real(t_end - t_start, real64)/real(t_rate, real64)
+    print '(A, F10.9, A)', "Formerr (Spec Unwrap):   ", t_formerr, " s"
+
+    print '(A, F12.2, A)', "Overhead (Spec Unwrap):  ", t_formerr/t_native, "x"
+
+    ! 4. Formerr: Result Type (Fully Specialized)
+    call system_clock(t_start)
+    call bench_result_fully_specialized(ITERATIONS)
+    call system_clock(t_end)
+    t_formerr = real(t_end - t_start, real64)/real(t_rate, real64)
+    print '(A, F10.9, A)', "Formerr (Fully Spec):    ", t_formerr, " s"
+
+    print '(A, F12.2, A)', "Overhead (Fully Spec):   ", t_formerr/t_native, "x"
 
 contains
 
@@ -50,7 +68,7 @@ contains
         stat = 0 ! Success
     end subroutine
 
-    ! --- Formerr implementation ---
+    ! --- Formerr implementation (Generic) ---
     subroutine bench_result_success(n)
         integer, intent(in) :: n
         integer :: i
@@ -61,13 +79,46 @@ contains
             res = formerr_add(i, 1)
             if (.not. res%is_ok()) error stop "Fail"
 
-            ! Access value (simulation of unwrap cost)
+            ! Access value (generic unwrap)
             val => res%unwrap()
             select type (val)
             type is (integer)
-                ! use val to prevent optimization removal
                 if (val < 0) stop
             end select
+        end do
+    end subroutine
+
+    ! --- Formerr implementation (Specialized Unwrap) ---
+    subroutine bench_result_specialized(n)
+        integer, intent(in) :: n
+        integer :: i, val
+        type(result_type) :: res
+
+        do i = 1, n
+            ! Generic construction
+            res = formerr_add(i, 1)
+            if (.not. res%is_ok()) error stop "Fail"
+
+            ! Specialized unwrap
+            val = res%unwrap_int()
+            if (val < 0) stop
+        end do
+    end subroutine
+
+    ! --- Formerr implementation (Fully Specialized) ---
+    subroutine bench_result_fully_specialized(n)
+        integer, intent(in) :: n
+        integer :: i, val
+        type(result_type) :: res
+
+        do i = 1, n
+            ! Specialized construction
+            res = formerr_add_int(i, 1)
+            if (.not. res%is_ok()) error stop "Fail"
+
+            ! Specialized unwrap
+            val = res%unwrap_int()
+            if (val < 0) stop
         end do
     end subroutine
 
@@ -75,6 +126,12 @@ contains
         integer, intent(in) :: a, b
         type(result_type) :: res
         res = ok(a + b)
+    end function
+
+    function formerr_add_int(a, b) result(res)
+        integer, intent(in) :: a, b
+        type(result_type) :: res
+        res = ok_int(a + b)
     end function
 
 end program benchmark

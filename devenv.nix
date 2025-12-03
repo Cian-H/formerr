@@ -11,6 +11,7 @@
     pkgs.fortls
     pkgs.fortran-fpm
     pkgs.fprettify
+    pkgs.fypp
   ];
 
   languages.fortran.enable = true;
