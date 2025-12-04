@@ -50,7 +50,7 @@ def generate_option():
         specialized_impls=specialized_impls,
     )
 
-    with open("src/formerr_option.f90", "w") as f:
+    with Path("src/formerr_option.f90").open("w+") as f:
         f.write(content)
 
 

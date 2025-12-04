@@ -68,7 +68,7 @@ def generate_result():
         specialized_impls=specialized_impls,
     )
 
-    with open("src/formerr_result.f90", "w") as f:
+    with Path("src/formerr_result.f90").open("w+") as f:
         f.write(content)
 
 

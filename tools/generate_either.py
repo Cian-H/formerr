@@ -125,7 +125,7 @@ def generate_either():
         specialized_impls=specialized_impls,
     )
 
-    with open("src/formerr_either.f90", "w") as f:
+    with Path("src/formerr_either.f90").open("w+") as f:
         f.write(content)
 
 
