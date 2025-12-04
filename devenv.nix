@@ -25,5 +25,12 @@
     yamlfmt.enable = true;
   };
 
-  scripts.run-bench.exec = "fortran-fpm test bench --profile release";
+  scripts = {
+    codegen.exec = "python $DEVENV_ROOT/tools/generate.py";
+    build-dev.exec = "codegen && fortran-fpm build";
+    build.exec = "codegen && fortran-fpm build --profile release";
+    bench.exec = "codegen && build && fortran-fpm test bench --profile release";
+    test-dev.exec = "codegen && build-dev && fortran-fpm test";
+    test-release.exec = "codegen && build && fortran-fpm test --profile release";
+  };
 }
