@@ -47,7 +47,9 @@ def generate_result():
     pure elemental function unwrap_{t_suffix}(this) result(val) !GCC$ attributes always_inline :: unwrap_{t_suffix}
         class(result_type), intent(in) :: this
         {t_type} :: val
-        if (this%is_err()) error stop \"unwrap_{t_suffix} called on Err value\"
+        if (this%is_err()) then
+            if (DO_CHECKS) error stop \"unwrap_{t_suffix} called on Err value\"
+        end if
         val = this%get_right_{t_suffix}()
     end function unwrap_{t_suffix}
 """
@@ -57,7 +59,9 @@ def generate_result():
     pure elemental function unwrap_err_{t_suffix}(this) result(val) !GCC$ attributes always_inline :: unwrap_err_{t_suffix}
         class(result_type), intent(in) :: this
         {t_type} :: val
-        if (this%is_ok()) error stop \"unwrap_err_{t_suffix} called on Ok value\"
+        if (this%is_ok()) then
+            if (DO_CHECKS) error stop \"unwrap_err_{t_suffix} called on Ok value\"
+        end if
         val = this%get_left_{t_suffix}()
     end function unwrap_err_{t_suffix}
 """

@@ -9,7 +9,10 @@ module formerr_either
     ! Type constants
     integer, parameter :: TYPE_NONE = 0
     integer, parameter :: TYPE_DYN = 1
+    logical, parameter :: DO_CHECKS = .false.
     {type_constants}
+
+
 
     type :: either
         private
@@ -59,7 +62,7 @@ contains
         else if (present(right_val) .and. .not. present(left_val)) then
             res = new_right(right_val)
         else
-            error stop "either constructor requires exactly one argument"
+            if (DO_CHECKS) error stop "either constructor requires exactly one argument"
         end if
     end function new_either
 

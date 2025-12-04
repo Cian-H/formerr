@@ -9,6 +9,7 @@ module formerr_either
     ! Type constants
     integer, parameter :: TYPE_NONE = 0
     integer, parameter :: TYPE_DYN = 1
+    logical, parameter :: DO_CHECKS = .false.
         integer, parameter :: STORAGE_SIZE = 16
     integer, parameter :: TYPE_INT = 2
     integer, parameter :: TYPE_I8 = 3
@@ -19,6 +20,8 @@ module formerr_either
     integer, parameter :: TYPE_LOG = 8
     integer, parameter :: TYPE_CPX = 9
     integer, parameter :: TYPE_C64 = 10
+
+
 
 
     type :: either
@@ -107,7 +110,7 @@ contains
         else if (present(right_val) .and. .not. present(left_val)) then
             res = new_right(right_val)
         else
-            error stop "either constructor requires exactly one argument"
+            if (DO_CHECKS) error stop "either constructor requires exactly one argument"
         end if
     end function new_either
 
@@ -156,23 +159,23 @@ contains
         case (TYPE_DYN)
             if (allocated(this%l_val_dyn)) ptr => this%l_val_dyn
                 case (TYPE_INT)
-            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (integer)."
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (integer)."
         case (TYPE_I8)
-            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (integer(int8))."
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (integer(int8))."
         case (TYPE_I16)
-            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (integer(int16))."
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (integer(int16))."
         case (TYPE_I64)
-            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (integer(int64))."
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (integer(int64))."
         case (TYPE_REAL)
-            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real)."
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real)."
         case (TYPE_R64)
-            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real(real64))."
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real(real64))."
         case (TYPE_LOG)
-            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (logical)."
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (logical)."
         case (TYPE_CPX)
-            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (complex)."
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (complex)."
         case (TYPE_C64)
-            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (complex(real64))."
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (complex(real64))."
 
         end select
     end function get_left
@@ -186,23 +189,23 @@ contains
         case (TYPE_DYN)
             if (allocated(this%r_val_dyn)) ptr => this%r_val_dyn
                 case (TYPE_INT)
-            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (integer)."
+            if (DO_CHECKS) error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (integer)."
         case (TYPE_I8)
-            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (integer(int8))."
+            if (DO_CHECKS) error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (integer(int8))."
         case (TYPE_I16)
-            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (integer(int16))."
+            if (DO_CHECKS) error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (integer(int16))."
         case (TYPE_I64)
-            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (integer(int64))."
+            if (DO_CHECKS) error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (integer(int64))."
         case (TYPE_REAL)
-            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (real)."
+            if (DO_CHECKS) error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (real)."
         case (TYPE_R64)
-            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (real(real64))."
+            if (DO_CHECKS) error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (real(real64))."
         case (TYPE_LOG)
-            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (logical)."
+            if (DO_CHECKS) error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (logical)."
         case (TYPE_CPX)
-            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (complex)."
+            if (DO_CHECKS) error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (complex)."
         case (TYPE_C64)
-            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (complex(real64))."
+            if (DO_CHECKS) error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (complex(real64))."
 
         end select
     end function get_right
@@ -291,10 +294,10 @@ contains
              type is (integer)
                  val = v
              class default
-                 error stop "get_left_int type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_left_int type mismatch in dynamic storage"
              end select
         else
-            error stop "get_left_int called on wrong type"
+            if (DO_CHECKS) error stop "get_left_int called on wrong type"
         end if
     end function get_left_int
     pure elemental function get_right_int(this) result(val) !GCC$ attributes always_inline :: get_right_int
@@ -307,10 +310,10 @@ contains
              type is (integer)
                  val = v
              class default
-                 error stop "get_right_int type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_right_int type mismatch in dynamic storage"
              end select
         else
-            error stop "get_right_int called on wrong type"
+            if (DO_CHECKS) error stop "get_right_int called on wrong type"
         end if
     end function get_right_int
     pure elemental subroutine set_left_int(this, val) !GCC$ attributes always_inline :: set_left_int
@@ -347,10 +350,10 @@ contains
              type is (integer(int8))
                  val = v
              class default
-                 error stop "get_left_i8 type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_left_i8 type mismatch in dynamic storage"
              end select
         else
-            error stop "get_left_i8 called on wrong type"
+            if (DO_CHECKS) error stop "get_left_i8 called on wrong type"
         end if
     end function get_left_i8
     pure elemental function get_right_i8(this) result(val) !GCC$ attributes always_inline :: get_right_i8
@@ -363,10 +366,10 @@ contains
              type is (integer(int8))
                  val = v
              class default
-                 error stop "get_right_i8 type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_right_i8 type mismatch in dynamic storage"
              end select
         else
-            error stop "get_right_i8 called on wrong type"
+            if (DO_CHECKS) error stop "get_right_i8 called on wrong type"
         end if
     end function get_right_i8
     pure elemental subroutine set_left_i8(this, val) !GCC$ attributes always_inline :: set_left_i8
@@ -403,10 +406,10 @@ contains
              type is (integer(int16))
                  val = v
              class default
-                 error stop "get_left_i16 type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_left_i16 type mismatch in dynamic storage"
              end select
         else
-            error stop "get_left_i16 called on wrong type"
+            if (DO_CHECKS) error stop "get_left_i16 called on wrong type"
         end if
     end function get_left_i16
     pure elemental function get_right_i16(this) result(val) !GCC$ attributes always_inline :: get_right_i16
@@ -419,10 +422,10 @@ contains
              type is (integer(int16))
                  val = v
              class default
-                 error stop "get_right_i16 type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_right_i16 type mismatch in dynamic storage"
              end select
         else
-            error stop "get_right_i16 called on wrong type"
+            if (DO_CHECKS) error stop "get_right_i16 called on wrong type"
         end if
     end function get_right_i16
     pure elemental subroutine set_left_i16(this, val) !GCC$ attributes always_inline :: set_left_i16
@@ -459,10 +462,10 @@ contains
              type is (integer(int64))
                  val = v
              class default
-                 error stop "get_left_i64 type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_left_i64 type mismatch in dynamic storage"
              end select
         else
-            error stop "get_left_i64 called on wrong type"
+            if (DO_CHECKS) error stop "get_left_i64 called on wrong type"
         end if
     end function get_left_i64
     pure elemental function get_right_i64(this) result(val) !GCC$ attributes always_inline :: get_right_i64
@@ -475,10 +478,10 @@ contains
              type is (integer(int64))
                  val = v
              class default
-                 error stop "get_right_i64 type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_right_i64 type mismatch in dynamic storage"
              end select
         else
-            error stop "get_right_i64 called on wrong type"
+            if (DO_CHECKS) error stop "get_right_i64 called on wrong type"
         end if
     end function get_right_i64
     pure elemental subroutine set_left_i64(this, val) !GCC$ attributes always_inline :: set_left_i64
@@ -515,10 +518,10 @@ contains
              type is (real)
                  val = v
              class default
-                 error stop "get_left_real type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_left_real type mismatch in dynamic storage"
              end select
         else
-            error stop "get_left_real called on wrong type"
+            if (DO_CHECKS) error stop "get_left_real called on wrong type"
         end if
     end function get_left_real
     pure elemental function get_right_real(this) result(val) !GCC$ attributes always_inline :: get_right_real
@@ -531,10 +534,10 @@ contains
              type is (real)
                  val = v
              class default
-                 error stop "get_right_real type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_right_real type mismatch in dynamic storage"
              end select
         else
-            error stop "get_right_real called on wrong type"
+            if (DO_CHECKS) error stop "get_right_real called on wrong type"
         end if
     end function get_right_real
     pure elemental subroutine set_left_real(this, val) !GCC$ attributes always_inline :: set_left_real
@@ -571,10 +574,10 @@ contains
              type is (real(real64))
                  val = v
              class default
-                 error stop "get_left_r64 type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_left_r64 type mismatch in dynamic storage"
              end select
         else
-            error stop "get_left_r64 called on wrong type"
+            if (DO_CHECKS) error stop "get_left_r64 called on wrong type"
         end if
     end function get_left_r64
     pure elemental function get_right_r64(this) result(val) !GCC$ attributes always_inline :: get_right_r64
@@ -587,10 +590,10 @@ contains
              type is (real(real64))
                  val = v
              class default
-                 error stop "get_right_r64 type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_right_r64 type mismatch in dynamic storage"
              end select
         else
-            error stop "get_right_r64 called on wrong type"
+            if (DO_CHECKS) error stop "get_right_r64 called on wrong type"
         end if
     end function get_right_r64
     pure elemental subroutine set_left_r64(this, val) !GCC$ attributes always_inline :: set_left_r64
@@ -627,10 +630,10 @@ contains
              type is (logical)
                  val = v
              class default
-                 error stop "get_left_log type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_left_log type mismatch in dynamic storage"
              end select
         else
-            error stop "get_left_log called on wrong type"
+            if (DO_CHECKS) error stop "get_left_log called on wrong type"
         end if
     end function get_left_log
     pure elemental function get_right_log(this) result(val) !GCC$ attributes always_inline :: get_right_log
@@ -643,10 +646,10 @@ contains
              type is (logical)
                  val = v
              class default
-                 error stop "get_right_log type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_right_log type mismatch in dynamic storage"
              end select
         else
-            error stop "get_right_log called on wrong type"
+            if (DO_CHECKS) error stop "get_right_log called on wrong type"
         end if
     end function get_right_log
     pure elemental subroutine set_left_log(this, val) !GCC$ attributes always_inline :: set_left_log
@@ -683,10 +686,10 @@ contains
              type is (complex)
                  val = v
              class default
-                 error stop "get_left_cpx type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_left_cpx type mismatch in dynamic storage"
              end select
         else
-            error stop "get_left_cpx called on wrong type"
+            if (DO_CHECKS) error stop "get_left_cpx called on wrong type"
         end if
     end function get_left_cpx
     pure elemental function get_right_cpx(this) result(val) !GCC$ attributes always_inline :: get_right_cpx
@@ -699,10 +702,10 @@ contains
              type is (complex)
                  val = v
              class default
-                 error stop "get_right_cpx type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_right_cpx type mismatch in dynamic storage"
              end select
         else
-            error stop "get_right_cpx called on wrong type"
+            if (DO_CHECKS) error stop "get_right_cpx called on wrong type"
         end if
     end function get_right_cpx
     pure elemental subroutine set_left_cpx(this, val) !GCC$ attributes always_inline :: set_left_cpx
@@ -739,10 +742,10 @@ contains
              type is (complex(real64))
                  val = v
              class default
-                 error stop "get_left_c64 type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_left_c64 type mismatch in dynamic storage"
              end select
         else
-            error stop "get_left_c64 called on wrong type"
+            if (DO_CHECKS) error stop "get_left_c64 called on wrong type"
         end if
     end function get_left_c64
     pure elemental function get_right_c64(this) result(val) !GCC$ attributes always_inline :: get_right_c64
@@ -755,10 +758,10 @@ contains
              type is (complex(real64))
                  val = v
              class default
-                 error stop "get_right_c64 type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_right_c64 type mismatch in dynamic storage"
              end select
         else
-            error stop "get_right_c64 called on wrong type"
+            if (DO_CHECKS) error stop "get_right_c64 called on wrong type"
         end if
     end function get_right_c64
     pure elemental subroutine set_left_c64(this, val) !GCC$ attributes always_inline :: set_left_c64

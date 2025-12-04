@@ -5,6 +5,8 @@ module formerr_option
     implicit none
     private
 
+    logical, parameter :: DO_CHECKS = .false.
+
     public :: option, some, none, is_some, is_none, unwrap, unwrap_or
     public :: some_move, unwrap_move
     {public_procedures}
@@ -56,7 +58,7 @@ contains
         class(option), intent(in), target :: this
         class(*), pointer :: ptr
 
-        call check(this%is_some(), "unwrap called on None value")
+        if (DO_CHECKS) call check(this%is_some(), "unwrap called on None value")
 
         ptr => this%get_right()
     end function unwrap
@@ -83,7 +85,7 @@ contains
         type(unit_type) :: u
         class(*), allocatable :: temp_none
 
-        call check(this%is_some(), "unwrap_move called on None value")
+        if (DO_CHECKS) call check(this%is_some(), "unwrap_move called on None value")
 
         ! 1. Prepare the None state (Unit type)
         allocate(temp_none, source=u)

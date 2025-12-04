@@ -43,10 +43,10 @@ def generate_either():
 
         # Generic Dispatch Cases - Error on Union types for pointer return
         get_left_cases += f"        case ({const_name})\n"
-        get_left_cases += f'            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value ({t_type})."\n'
+        get_left_cases += f'            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value ({t_type})."\n'
 
         get_right_cases += f"        case ({const_name})\n"
-        get_right_cases += f'            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value ({t_type})."\n'
+        get_right_cases += f'            if (DO_CHECKS) error stop "get_right (Generic) cannot return pointer to Specialized (Union) value ({t_type})."\n'
 
         # NOTE: We leave set_left_cases/set_right_cases EMPTY.
         # This forces Generic Set to fall through to `class default` (Dynamic allocation).
@@ -69,10 +69,10 @@ def generate_either():
              type is ({t_type})
                  val = v
              class default
-                 error stop "get_left_{t_suffix} type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_left_{t_suffix} type mismatch in dynamic storage"
              end select
         else
-            error stop "get_left_{t_suffix} called on wrong type"
+            if (DO_CHECKS) error stop "get_left_{t_suffix} called on wrong type"
         end if
     end function get_left_{t_suffix}"""
 
@@ -88,10 +88,10 @@ def generate_either():
              type is ({t_type})
                  val = v
              class default
-                 error stop "get_right_{t_suffix} type mismatch in dynamic storage"
+                 if (DO_CHECKS) error stop "get_right_{t_suffix} type mismatch in dynamic storage"
              end select
         else
-            error stop "get_right_{t_suffix} called on wrong type"
+            if (DO_CHECKS) error stop "get_right_{t_suffix} called on wrong type"
         end if
     end function get_right_{t_suffix}"""
 

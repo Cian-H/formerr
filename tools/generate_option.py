@@ -38,7 +38,9 @@ def generate_option():
     pure elemental function unwrap_{t_suffix}(this) result(val) !GCC$ attributes always_inline :: unwrap_{t_suffix}
         class(option), intent(in) :: this
         {t_type} :: val
-        if (this%is_none()) error stop "unwrap_{t_suffix} called on None value"
+        if (this%is_none()) then
+            if (DO_CHECKS) error stop "unwrap_{t_suffix} called on None value"
+        end if
         ! We call the specialized getter from either
         val = this%get_right_{t_suffix}()
     end function unwrap_{t_suffix}

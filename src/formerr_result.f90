@@ -5,6 +5,8 @@ module formerr_result
     implicit none
     private
 
+    logical, parameter :: DO_CHECKS = .false.
+
     public :: result_type, ok, err, is_ok, is_err, unwrap, unwrap_err, unwrap_or
     public :: ok_move, err_move, unwrap_move_to_err, unsafe_unwrap_move
         public :: ok_int, err_int
@@ -88,7 +90,7 @@ contains
         class(result_type), intent(in), target :: this
         class(*), pointer :: ptr
 
-        call check(this%is_ok(), "unwrap called on Err value")
+        if (DO_CHECKS) call check(this%is_ok(), "unwrap called on Err value")
 
         ptr => this%get_right()
     end function unwrap
@@ -97,7 +99,7 @@ contains
         class(result_type), intent(in), target :: this
         class(*), pointer :: ptr
 
-        call check(this%is_err(), "unwrap_err called on Ok value")
+        if (DO_CHECKS) call check(this%is_err(), "unwrap_err called on Ok value")
 
         ptr => this%get_left()
     end function unwrap_err
@@ -124,7 +126,7 @@ contains
         class(*), intent(in) :: replacement_err
         class(*), allocatable :: temp_err
 
-        call check(this%is_ok(), "unwrap_move_to_err called on Err value")
+        if (DO_CHECKS) call check(this%is_ok(), "unwrap_move_to_err called on Err value")
 
         ! 1. Allocate the replacement error first to ensure safety if alloc fails
         allocate(temp_err, source=replacement_err)
@@ -141,7 +143,7 @@ contains
         class(result_type), intent(inout) :: this
         class(*), allocatable, intent(out) :: dest
 
-        call check(this%is_ok(), "unsafe_unwrap_move called on Err value")
+        if (DO_CHECKS) call check(this%is_ok(), "unsafe_unwrap_move called on Err value")
 
         ! Zero-cost pointer swap. No allocations.
         call this%move_right(dest)
@@ -167,14 +169,18 @@ contains
     pure elemental function unwrap_int(this) result(val) !GCC$ attributes always_inline :: unwrap_int
         class(result_type), intent(in) :: this
         integer :: val
-        if (this%is_err()) error stop "unwrap_int called on Err value"
+        if (this%is_err()) then
+            if (DO_CHECKS) error stop "unwrap_int called on Err value"
+        end if
         val = this%get_right_int()
     end function unwrap_int
 
     pure elemental function unwrap_err_int(this) result(val) !GCC$ attributes always_inline :: unwrap_err_int
         class(result_type), intent(in) :: this
         integer :: val
-        if (this%is_ok()) error stop "unwrap_err_int called on Ok value"
+        if (this%is_ok()) then
+            if (DO_CHECKS) error stop "unwrap_err_int called on Ok value"
+        end if
         val = this%get_left_int()
     end function unwrap_err_int
 
@@ -193,14 +199,18 @@ contains
     pure elemental function unwrap_i8(this) result(val) !GCC$ attributes always_inline :: unwrap_i8
         class(result_type), intent(in) :: this
         integer(int8) :: val
-        if (this%is_err()) error stop "unwrap_i8 called on Err value"
+        if (this%is_err()) then
+            if (DO_CHECKS) error stop "unwrap_i8 called on Err value"
+        end if
         val = this%get_right_i8()
     end function unwrap_i8
 
     pure elemental function unwrap_err_i8(this) result(val) !GCC$ attributes always_inline :: unwrap_err_i8
         class(result_type), intent(in) :: this
         integer(int8) :: val
-        if (this%is_ok()) error stop "unwrap_err_i8 called on Ok value"
+        if (this%is_ok()) then
+            if (DO_CHECKS) error stop "unwrap_err_i8 called on Ok value"
+        end if
         val = this%get_left_i8()
     end function unwrap_err_i8
 
@@ -219,14 +229,18 @@ contains
     pure elemental function unwrap_i16(this) result(val) !GCC$ attributes always_inline :: unwrap_i16
         class(result_type), intent(in) :: this
         integer(int16) :: val
-        if (this%is_err()) error stop "unwrap_i16 called on Err value"
+        if (this%is_err()) then
+            if (DO_CHECKS) error stop "unwrap_i16 called on Err value"
+        end if
         val = this%get_right_i16()
     end function unwrap_i16
 
     pure elemental function unwrap_err_i16(this) result(val) !GCC$ attributes always_inline :: unwrap_err_i16
         class(result_type), intent(in) :: this
         integer(int16) :: val
-        if (this%is_ok()) error stop "unwrap_err_i16 called on Ok value"
+        if (this%is_ok()) then
+            if (DO_CHECKS) error stop "unwrap_err_i16 called on Ok value"
+        end if
         val = this%get_left_i16()
     end function unwrap_err_i16
 
@@ -245,14 +259,18 @@ contains
     pure elemental function unwrap_i64(this) result(val) !GCC$ attributes always_inline :: unwrap_i64
         class(result_type), intent(in) :: this
         integer(int64) :: val
-        if (this%is_err()) error stop "unwrap_i64 called on Err value"
+        if (this%is_err()) then
+            if (DO_CHECKS) error stop "unwrap_i64 called on Err value"
+        end if
         val = this%get_right_i64()
     end function unwrap_i64
 
     pure elemental function unwrap_err_i64(this) result(val) !GCC$ attributes always_inline :: unwrap_err_i64
         class(result_type), intent(in) :: this
         integer(int64) :: val
-        if (this%is_ok()) error stop "unwrap_err_i64 called on Ok value"
+        if (this%is_ok()) then
+            if (DO_CHECKS) error stop "unwrap_err_i64 called on Ok value"
+        end if
         val = this%get_left_i64()
     end function unwrap_err_i64
 
@@ -271,14 +289,18 @@ contains
     pure elemental function unwrap_real(this) result(val) !GCC$ attributes always_inline :: unwrap_real
         class(result_type), intent(in) :: this
         real :: val
-        if (this%is_err()) error stop "unwrap_real called on Err value"
+        if (this%is_err()) then
+            if (DO_CHECKS) error stop "unwrap_real called on Err value"
+        end if
         val = this%get_right_real()
     end function unwrap_real
 
     pure elemental function unwrap_err_real(this) result(val) !GCC$ attributes always_inline :: unwrap_err_real
         class(result_type), intent(in) :: this
         real :: val
-        if (this%is_ok()) error stop "unwrap_err_real called on Ok value"
+        if (this%is_ok()) then
+            if (DO_CHECKS) error stop "unwrap_err_real called on Ok value"
+        end if
         val = this%get_left_real()
     end function unwrap_err_real
 
@@ -297,14 +319,18 @@ contains
     pure elemental function unwrap_r64(this) result(val) !GCC$ attributes always_inline :: unwrap_r64
         class(result_type), intent(in) :: this
         real(real64) :: val
-        if (this%is_err()) error stop "unwrap_r64 called on Err value"
+        if (this%is_err()) then
+            if (DO_CHECKS) error stop "unwrap_r64 called on Err value"
+        end if
         val = this%get_right_r64()
     end function unwrap_r64
 
     pure elemental function unwrap_err_r64(this) result(val) !GCC$ attributes always_inline :: unwrap_err_r64
         class(result_type), intent(in) :: this
         real(real64) :: val
-        if (this%is_ok()) error stop "unwrap_err_r64 called on Ok value"
+        if (this%is_ok()) then
+            if (DO_CHECKS) error stop "unwrap_err_r64 called on Ok value"
+        end if
         val = this%get_left_r64()
     end function unwrap_err_r64
 
@@ -323,14 +349,18 @@ contains
     pure elemental function unwrap_log(this) result(val) !GCC$ attributes always_inline :: unwrap_log
         class(result_type), intent(in) :: this
         logical :: val
-        if (this%is_err()) error stop "unwrap_log called on Err value"
+        if (this%is_err()) then
+            if (DO_CHECKS) error stop "unwrap_log called on Err value"
+        end if
         val = this%get_right_log()
     end function unwrap_log
 
     pure elemental function unwrap_err_log(this) result(val) !GCC$ attributes always_inline :: unwrap_err_log
         class(result_type), intent(in) :: this
         logical :: val
-        if (this%is_ok()) error stop "unwrap_err_log called on Ok value"
+        if (this%is_ok()) then
+            if (DO_CHECKS) error stop "unwrap_err_log called on Ok value"
+        end if
         val = this%get_left_log()
     end function unwrap_err_log
 
@@ -349,14 +379,18 @@ contains
     pure elemental function unwrap_cpx(this) result(val) !GCC$ attributes always_inline :: unwrap_cpx
         class(result_type), intent(in) :: this
         complex :: val
-        if (this%is_err()) error stop "unwrap_cpx called on Err value"
+        if (this%is_err()) then
+            if (DO_CHECKS) error stop "unwrap_cpx called on Err value"
+        end if
         val = this%get_right_cpx()
     end function unwrap_cpx
 
     pure elemental function unwrap_err_cpx(this) result(val) !GCC$ attributes always_inline :: unwrap_err_cpx
         class(result_type), intent(in) :: this
         complex :: val
-        if (this%is_ok()) error stop "unwrap_err_cpx called on Ok value"
+        if (this%is_ok()) then
+            if (DO_CHECKS) error stop "unwrap_err_cpx called on Ok value"
+        end if
         val = this%get_left_cpx()
     end function unwrap_err_cpx
 
@@ -375,14 +409,18 @@ contains
     pure elemental function unwrap_c64(this) result(val) !GCC$ attributes always_inline :: unwrap_c64
         class(result_type), intent(in) :: this
         complex(real64) :: val
-        if (this%is_err()) error stop "unwrap_c64 called on Err value"
+        if (this%is_err()) then
+            if (DO_CHECKS) error stop "unwrap_c64 called on Err value"
+        end if
         val = this%get_right_c64()
     end function unwrap_c64
 
     pure elemental function unwrap_err_c64(this) result(val) !GCC$ attributes always_inline :: unwrap_err_c64
         class(result_type), intent(in) :: this
         complex(real64) :: val
-        if (this%is_ok()) error stop "unwrap_err_c64 called on Ok value"
+        if (this%is_ok()) then
+            if (DO_CHECKS) error stop "unwrap_err_c64 called on Ok value"
+        end if
         val = this%get_left_c64()
     end function unwrap_err_c64
 

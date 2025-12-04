@@ -5,6 +5,8 @@ module formerr_result
     implicit none
     private
 
+    logical, parameter :: DO_CHECKS = .false.
+
     public :: result_type, ok, err, is_ok, is_err, unwrap, unwrap_err, unwrap_or
     public :: ok_move, err_move, unwrap_move_to_err, unsafe_unwrap_move
     {public_procedures}
@@ -61,7 +63,7 @@ contains
         class(result_type), intent(in), target :: this
         class(*), pointer :: ptr
 
-        call check(this%is_ok(), "unwrap called on Err value")
+        if (DO_CHECKS) call check(this%is_ok(), "unwrap called on Err value")
 
         ptr => this%get_right()
     end function unwrap
@@ -70,7 +72,7 @@ contains
         class(result_type), intent(in), target :: this
         class(*), pointer :: ptr
 
-        call check(this%is_err(), "unwrap_err called on Ok value")
+        if (DO_CHECKS) call check(this%is_err(), "unwrap_err called on Ok value")
 
         ptr => this%get_left()
     end function unwrap_err
@@ -97,7 +99,7 @@ contains
         class(*), intent(in) :: replacement_err
         class(*), allocatable :: temp_err
 
-        call check(this%is_ok(), "unwrap_move_to_err called on Err value")
+        if (DO_CHECKS) call check(this%is_ok(), "unwrap_move_to_err called on Err value")
 
         ! 1. Allocate the replacement error first to ensure safety if alloc fails
         allocate(temp_err, source=replacement_err)
@@ -114,7 +116,7 @@ contains
         class(result_type), intent(inout) :: this
         class(*), allocatable, intent(out) :: dest
 
-        call check(this%is_ok(), "unsafe_unwrap_move called on Err value")
+        if (DO_CHECKS) call check(this%is_ok(), "unsafe_unwrap_move called on Err value")
 
         ! Zero-cost pointer swap. No allocations.
         call this%move_right(dest)
