@@ -10,8 +10,12 @@ with EITHER_TEMPLATE_PATH.open("rt") as f:
 
 
 def generate_either():
-    type_constants = ""
-    type_fields = ""
+    type_constants = "    integer, parameter :: STORAGE_SIZE = 16\n"
+
+    # Define the union storage buffer
+    type_fields = "        integer(int8) :: l_bytes(STORAGE_SIZE)\n"
+    type_fields += "        integer(int8) :: r_bytes(STORAGE_SIZE)\n"
+
     get_left_cases = ""
     get_right_cases = ""
     set_left_cases = ""
@@ -31,85 +35,87 @@ def generate_either():
         const_name = f"TYPE_{t_suffix.upper()}"
         type_constants += f"    integer, parameter :: {const_name} = {type_id}\n"
 
-        # Embedded fields
-        type_fields += f"        {t_type} :: l_{t_suffix}\n"
-        type_fields += f"        {t_type} :: r_{t_suffix}\n"
-
         # Type bound procedures
         type_bound_procedures += f"        procedure :: get_left_{t_suffix}\n"
         type_bound_procedures += f"        procedure :: get_right_{t_suffix}\n"
         type_bound_procedures += f"        procedure :: set_left_{t_suffix}\n"
         type_bound_procedures += f"        procedure :: set_right_{t_suffix}\n"
 
-        # Generic Dispatch Cases
+        # Generic Dispatch Cases - Error on Union types for pointer return
         get_left_cases += f"        case ({const_name})\n"
-        get_left_cases += f"            ptr => this%l_{t_suffix}\n"
+        get_left_cases += f'            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value ({t_type})."\n'
 
         get_right_cases += f"        case ({const_name})\n"
-        get_right_cases += f"            ptr => this%r_{t_suffix}\n"
+        get_right_cases += f'            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value ({t_type})."\n'
 
-        set_left_cases += f"        type is ({t_type})\n"
-        set_left_cases += f"            this%l_{t_suffix} = val\n"
-        set_left_cases += f"            this%active_l = {const_name}\n"
-
-        set_right_cases += f"        type is ({t_type})\n"
-        set_right_cases += f"            this%r_{t_suffix} = val\n"
-        set_right_cases += f"            this%active_r = {const_name}\n"
-
-        move_left_cases += f"        type is ({t_type})\n"
-        move_left_cases += f"            this%l_{t_suffix} = val\n"
-        move_left_cases += f"            this%active_l = {const_name}\n"
-
-        move_right_cases += f"        type is ({t_type})\n"
-        move_right_cases += f"            this%r_{t_suffix} = val\n"
-        move_right_cases += f"            this%active_r = {const_name}\n"
+        # NOTE: We leave set_left_cases/set_right_cases EMPTY.
+        # This forces Generic Set to fall through to `class default` (Dynamic allocation).
+        # This is necessary because we cannot trivially determine if a generic `val` is "small enough"
+        # or matches the specialized types without the `type is` blocks, but if we use `type is` blocks
+        # and assign to `l_bytes` via transfer, we lose the ability to return a pointer in `get_left` (Generic).
+        # So Generic Set -> Dynamic Storage. Specialized Set -> Union Storage.
 
         # Specialized Implementation Code
 
         # GET LEFT
-        specialized_impls += f'\n    function get_left_{
-            t_suffix
-        }(this) result(val)\n        class(either), intent(in) :: this\n        {
-            t_type
-        } :: val\n        if (this%active_l == {
-            const_name
-        }) then\n            val = this%l_{
-            t_suffix
-        }\n        else\n            error stop "get_left_{
-            t_suffix
-        } called on wrong type"\n        end if\n    end function get_left_{t_suffix}'
+        specialized_impls += f"""
+    function get_left_{t_suffix}(this) result(val)
+        class(either), intent(in) :: this
+        {t_type} :: val
+        if (this%active_l == {const_name}) then
+            val = transfer(this%l_bytes, val)
+        else if (this%active_l == TYPE_DYN) then
+             select type (v => this%l_val_dyn)
+             type is ({t_type})
+                 val = v
+             class default
+                 error stop "get_left_{t_suffix} type mismatch in dynamic storage"
+             end select
+        else
+            error stop "get_left_{t_suffix} called on wrong type"
+        end if
+    end function get_left_{t_suffix}"""
+
         # GET RIGHT
-        specialized_impls += f'\n    function get_right_{
-            t_suffix
-        }(this) result(val)\n        class(either), intent(in) :: this\n        {
-            t_type
-        } :: val\n        if (this%active_r == {
-            const_name
-        }) then\n            val = this%r_{
-            t_suffix
-        }\n        else\n            error stop "get_right_{
-            t_suffix
-        } called on wrong type"\n        end if\n    end function get_right_{t_suffix}'
+        specialized_impls += f"""
+    function get_right_{t_suffix}(this) result(val)
+        class(either), intent(in) :: this
+        {t_type} :: val
+        if (this%active_r == {const_name}) then
+            val = transfer(this%r_bytes, val)
+        else if (this%active_r == TYPE_DYN) then
+             select type (v => this%r_val_dyn)
+             type is ({t_type})
+                 val = v
+             class default
+                 error stop "get_right_{t_suffix} type mismatch in dynamic storage"
+             end select
+        else
+            error stop "get_right_{t_suffix} called on wrong type"
+        end if
+    end function get_right_{t_suffix}"""
+
         # SET LEFT
-        specialized_impls += f"\n    subroutine set_left_{
-            t_suffix
-        }(this, val)\n        class(either), intent(inout) :: this\n        {
-            t_type
-        }, intent(in) :: val\n        call this%clear_left()\n        call this%clear_right()\n        this%l_{
-            t_suffix
-        } = val\n        this%active_l = {const_name}\n    end subroutine set_left_{
-            t_suffix
-        }"
+        specialized_impls += f"""
+    subroutine set_left_{t_suffix}(this, val)
+        class(either), intent(inout) :: this
+        {t_type}, intent(in) :: val
+        call this%clear_left()
+        call this%clear_right()
+        this%l_bytes = transfer(val, this%l_bytes)
+        this%active_l = {const_name}
+    end subroutine set_left_{t_suffix}"""
+
         # SET RIGHT
-        specialized_impls += f"\n    subroutine set_right_{
-            t_suffix
-        }(this, val)\n        class(either), intent(inout) :: this\n        {
-            t_type
-        }, intent(in) :: val\n        call this%clear_left()\n        call this%clear_right()\n        this%r_{
-            t_suffix
-        } = val\n        this%active_r = {const_name}\n    end subroutine set_right_{
-            t_suffix
-        }"
+        specialized_impls += f"""
+    subroutine set_right_{t_suffix}(this, val)
+        class(either), intent(inout) :: this
+        {t_type}, intent(in) :: val
+        call this%clear_left()
+        call this%clear_right()
+        this%r_bytes = transfer(val, this%r_bytes)
+        this%active_r = {const_name}
+    end subroutine set_right_{t_suffix}"""
 
     content = EITHER_TEMPLATE.format(
         type_constants=type_constants,

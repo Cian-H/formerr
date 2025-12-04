@@ -8,6 +8,7 @@ module formerr_either
     ! Type constants
     integer, parameter :: TYPE_NONE = 0
     integer, parameter :: TYPE_DYN = 1
+    integer, parameter :: STORAGE_SIZE = 16
     integer, parameter :: TYPE_INT = 2
     integer, parameter :: TYPE_I8 = 3
     integer, parameter :: TYPE_I16 = 4
@@ -28,24 +29,8 @@ module formerr_either
         class(*), allocatable :: r_val_dyn
 
         ! Monomorphised storage (embedded, non-allocatable)
-        integer :: l_int
-        integer :: r_int
-        integer(int8) :: l_i8
-        integer(int8) :: r_i8
-        integer(int16) :: l_i16
-        integer(int16) :: r_i16
-        integer(int64) :: l_i64
-        integer(int64) :: r_i64
-        real :: l_real
-        real :: r_real
-        real(real64) :: l_r64
-        real(real64) :: r_r64
-        logical :: l_log
-        logical :: r_log
-        complex :: l_cpx
-        complex :: r_cpx
-        complex(real64) :: l_c64
-        complex(real64) :: r_c64
+        integer(int8) :: l_bytes(STORAGE_SIZE)
+        integer(int8) :: r_bytes(STORAGE_SIZE)
 
     contains
         procedure :: is_left
@@ -169,23 +154,23 @@ contains
         case (TYPE_DYN)
             if (allocated(this%l_val_dyn)) ptr => this%l_val_dyn
         case (TYPE_INT)
-            ptr => this%l_int
+            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (integer)."
         case (TYPE_I8)
-            ptr => this%l_i8
+            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (integer(int8))."
         case (TYPE_I16)
-            ptr => this%l_i16
+            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (integer(int16))."
         case (TYPE_I64)
-            ptr => this%l_i64
+            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (integer(int64))."
         case (TYPE_REAL)
-            ptr => this%l_real
+            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real)."
         case (TYPE_R64)
-            ptr => this%l_r64
+            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real(real64))."
         case (TYPE_LOG)
-            ptr => this%l_log
+            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (logical)."
         case (TYPE_CPX)
-            ptr => this%l_cpx
+            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (complex)."
         case (TYPE_C64)
-            ptr => this%l_c64
+            error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (complex(real64))."
 
         end select
     end function get_left
@@ -199,23 +184,23 @@ contains
         case (TYPE_DYN)
             if (allocated(this%r_val_dyn)) ptr => this%r_val_dyn
         case (TYPE_INT)
-            ptr => this%r_int
+            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (integer)."
         case (TYPE_I8)
-            ptr => this%r_i8
+            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (integer(int8))."
         case (TYPE_I16)
-            ptr => this%r_i16
+            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (integer(int16))."
         case (TYPE_I64)
-            ptr => this%r_i64
+            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (integer(int64))."
         case (TYPE_REAL)
-            ptr => this%r_real
+            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (real)."
         case (TYPE_R64)
-            ptr => this%r_r64
+            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (real(real64))."
         case (TYPE_LOG)
-            ptr => this%r_log
+            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (logical)."
         case (TYPE_CPX)
-            ptr => this%r_cpx
+            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (complex)."
         case (TYPE_C64)
-            ptr => this%r_c64
+            error stop "get_right (Generic) cannot return pointer to Specialized (Union) value (complex(real64))."
 
         end select
     end function get_right
@@ -229,33 +214,6 @@ contains
         call this%clear_right()
 
         select type (val)
-        type is (integer)
-            this%l_int = val
-            this%active_l = TYPE_INT
-        type is (integer(int8))
-            this%l_i8 = val
-            this%active_l = TYPE_I8
-        type is (integer(int16))
-            this%l_i16 = val
-            this%active_l = TYPE_I16
-        type is (integer(int64))
-            this%l_i64 = val
-            this%active_l = TYPE_I64
-        type is (real)
-            this%l_real = val
-            this%active_l = TYPE_REAL
-        type is (real(real64))
-            this%l_r64 = val
-            this%active_l = TYPE_R64
-        type is (logical)
-            this%l_log = val
-            this%active_l = TYPE_LOG
-        type is (complex)
-            this%l_cpx = val
-            this%active_l = TYPE_CPX
-        type is (complex(real64))
-            this%l_c64 = val
-            this%active_l = TYPE_C64
 
         class default
             allocate (this%l_val_dyn, source=val)
@@ -271,33 +229,6 @@ contains
         call this%clear_right()
 
         select type (val)
-        type is (integer)
-            this%r_int = val
-            this%active_r = TYPE_INT
-        type is (integer(int8))
-            this%r_i8 = val
-            this%active_r = TYPE_I8
-        type is (integer(int16))
-            this%r_i16 = val
-            this%active_r = TYPE_I16
-        type is (integer(int64))
-            this%r_i64 = val
-            this%active_r = TYPE_I64
-        type is (real)
-            this%r_real = val
-            this%active_r = TYPE_REAL
-        type is (real(real64))
-            this%r_r64 = val
-            this%active_r = TYPE_R64
-        type is (logical)
-            this%r_log = val
-            this%active_r = TYPE_LOG
-        type is (complex)
-            this%r_cpx = val
-            this%active_r = TYPE_CPX
-        type is (complex(real64))
-            this%r_c64 = val
-            this%active_r = TYPE_C64
 
         class default
             allocate (this%r_val_dyn, source=val)
@@ -316,33 +247,6 @@ contains
         if (.not. allocated(val)) return
 
         select type (val)
-        type is (integer)
-            this%l_int = val
-            this%active_l = TYPE_INT
-        type is (integer(int8))
-            this%l_i8 = val
-            this%active_l = TYPE_I8
-        type is (integer(int16))
-            this%l_i16 = val
-            this%active_l = TYPE_I16
-        type is (integer(int64))
-            this%l_i64 = val
-            this%active_l = TYPE_I64
-        type is (real)
-            this%l_real = val
-            this%active_l = TYPE_REAL
-        type is (real(real64))
-            this%l_r64 = val
-            this%active_l = TYPE_R64
-        type is (logical)
-            this%l_log = val
-            this%active_l = TYPE_LOG
-        type is (complex)
-            this%l_cpx = val
-            this%active_l = TYPE_CPX
-        type is (complex(real64))
-            this%l_c64 = val
-            this%active_l = TYPE_C64
 
         class default
             call move_alloc(from=val, to=this%l_val_dyn)
@@ -364,33 +268,6 @@ contains
         if (.not. allocated(val)) return
 
         select type (val)
-        type is (integer)
-            this%r_int = val
-            this%active_r = TYPE_INT
-        type is (integer(int8))
-            this%r_i8 = val
-            this%active_r = TYPE_I8
-        type is (integer(int16))
-            this%r_i16 = val
-            this%active_r = TYPE_I16
-        type is (integer(int64))
-            this%r_i64 = val
-            this%active_r = TYPE_I64
-        type is (real)
-            this%r_real = val
-            this%active_r = TYPE_REAL
-        type is (real(real64))
-            this%r_r64 = val
-            this%active_r = TYPE_R64
-        type is (logical)
-            this%r_log = val
-            this%active_r = TYPE_LOG
-        type is (complex)
-            this%r_cpx = val
-            this%active_r = TYPE_CPX
-        type is (complex(real64))
-            this%r_c64 = val
-            this%active_r = TYPE_C64
 
         class default
             call move_alloc(from=val, to=this%r_val_dyn)
@@ -406,7 +283,14 @@ contains
         class(either), intent(in) :: this
         integer :: val
         if (this%active_l == TYPE_INT) then
-            val = this%l_int
+            val = transfer(this%l_bytes, val)
+        else if (this%active_l == TYPE_DYN) then
+            select type (v => this%l_val_dyn)
+            type is (integer)
+                val = v
+            class default
+                error stop "get_left_int type mismatch in dynamic storage"
+            end select
         else
             error stop "get_left_int called on wrong type"
         end if
@@ -415,7 +299,14 @@ contains
         class(either), intent(in) :: this
         integer :: val
         if (this%active_r == TYPE_INT) then
-            val = this%r_int
+            val = transfer(this%r_bytes, val)
+        else if (this%active_r == TYPE_DYN) then
+            select type (v => this%r_val_dyn)
+            type is (integer)
+                val = v
+            class default
+                error stop "get_right_int type mismatch in dynamic storage"
+            end select
         else
             error stop "get_right_int called on wrong type"
         end if
@@ -425,7 +316,7 @@ contains
         integer, intent(in) :: val
         call this%clear_left()
         call this%clear_right()
-        this%l_int = val
+        this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = TYPE_INT
     end subroutine set_left_int
     subroutine set_right_int(this, val)
@@ -433,14 +324,21 @@ contains
         integer, intent(in) :: val
         call this%clear_left()
         call this%clear_right()
-        this%r_int = val
+        this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_INT
     end subroutine set_right_int
     function get_left_i8(this) result(val)
         class(either), intent(in) :: this
         integer(int8) :: val
         if (this%active_l == TYPE_I8) then
-            val = this%l_i8
+            val = transfer(this%l_bytes, val)
+        else if (this%active_l == TYPE_DYN) then
+            select type (v => this%l_val_dyn)
+            type is (integer(int8))
+                val = v
+            class default
+                error stop "get_left_i8 type mismatch in dynamic storage"
+            end select
         else
             error stop "get_left_i8 called on wrong type"
         end if
@@ -449,7 +347,14 @@ contains
         class(either), intent(in) :: this
         integer(int8) :: val
         if (this%active_r == TYPE_I8) then
-            val = this%r_i8
+            val = transfer(this%r_bytes, val)
+        else if (this%active_r == TYPE_DYN) then
+            select type (v => this%r_val_dyn)
+            type is (integer(int8))
+                val = v
+            class default
+                error stop "get_right_i8 type mismatch in dynamic storage"
+            end select
         else
             error stop "get_right_i8 called on wrong type"
         end if
@@ -459,7 +364,7 @@ contains
         integer(int8), intent(in) :: val
         call this%clear_left()
         call this%clear_right()
-        this%l_i8 = val
+        this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = TYPE_I8
     end subroutine set_left_i8
     subroutine set_right_i8(this, val)
@@ -467,14 +372,21 @@ contains
         integer(int8), intent(in) :: val
         call this%clear_left()
         call this%clear_right()
-        this%r_i8 = val
+        this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_I8
     end subroutine set_right_i8
     function get_left_i16(this) result(val)
         class(either), intent(in) :: this
         integer(int16) :: val
         if (this%active_l == TYPE_I16) then
-            val = this%l_i16
+            val = transfer(this%l_bytes, val)
+        else if (this%active_l == TYPE_DYN) then
+            select type (v => this%l_val_dyn)
+            type is (integer(int16))
+                val = v
+            class default
+                error stop "get_left_i16 type mismatch in dynamic storage"
+            end select
         else
             error stop "get_left_i16 called on wrong type"
         end if
@@ -483,7 +395,14 @@ contains
         class(either), intent(in) :: this
         integer(int16) :: val
         if (this%active_r == TYPE_I16) then
-            val = this%r_i16
+            val = transfer(this%r_bytes, val)
+        else if (this%active_r == TYPE_DYN) then
+            select type (v => this%r_val_dyn)
+            type is (integer(int16))
+                val = v
+            class default
+                error stop "get_right_i16 type mismatch in dynamic storage"
+            end select
         else
             error stop "get_right_i16 called on wrong type"
         end if
@@ -493,7 +412,7 @@ contains
         integer(int16), intent(in) :: val
         call this%clear_left()
         call this%clear_right()
-        this%l_i16 = val
+        this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = TYPE_I16
     end subroutine set_left_i16
     subroutine set_right_i16(this, val)
@@ -501,14 +420,21 @@ contains
         integer(int16), intent(in) :: val
         call this%clear_left()
         call this%clear_right()
-        this%r_i16 = val
+        this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_I16
     end subroutine set_right_i16
     function get_left_i64(this) result(val)
         class(either), intent(in) :: this
         integer(int64) :: val
         if (this%active_l == TYPE_I64) then
-            val = this%l_i64
+            val = transfer(this%l_bytes, val)
+        else if (this%active_l == TYPE_DYN) then
+            select type (v => this%l_val_dyn)
+            type is (integer(int64))
+                val = v
+            class default
+                error stop "get_left_i64 type mismatch in dynamic storage"
+            end select
         else
             error stop "get_left_i64 called on wrong type"
         end if
@@ -517,7 +443,14 @@ contains
         class(either), intent(in) :: this
         integer(int64) :: val
         if (this%active_r == TYPE_I64) then
-            val = this%r_i64
+            val = transfer(this%r_bytes, val)
+        else if (this%active_r == TYPE_DYN) then
+            select type (v => this%r_val_dyn)
+            type is (integer(int64))
+                val = v
+            class default
+                error stop "get_right_i64 type mismatch in dynamic storage"
+            end select
         else
             error stop "get_right_i64 called on wrong type"
         end if
@@ -527,7 +460,7 @@ contains
         integer(int64), intent(in) :: val
         call this%clear_left()
         call this%clear_right()
-        this%l_i64 = val
+        this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = TYPE_I64
     end subroutine set_left_i64
     subroutine set_right_i64(this, val)
@@ -535,14 +468,21 @@ contains
         integer(int64), intent(in) :: val
         call this%clear_left()
         call this%clear_right()
-        this%r_i64 = val
+        this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_I64
     end subroutine set_right_i64
     function get_left_real(this) result(val)
         class(either), intent(in) :: this
         real :: val
         if (this%active_l == TYPE_REAL) then
-            val = this%l_real
+            val = transfer(this%l_bytes, val)
+        else if (this%active_l == TYPE_DYN) then
+            select type (v => this%l_val_dyn)
+            type is (real)
+                val = v
+            class default
+                error stop "get_left_real type mismatch in dynamic storage"
+            end select
         else
             error stop "get_left_real called on wrong type"
         end if
@@ -551,7 +491,14 @@ contains
         class(either), intent(in) :: this
         real :: val
         if (this%active_r == TYPE_REAL) then
-            val = this%r_real
+            val = transfer(this%r_bytes, val)
+        else if (this%active_r == TYPE_DYN) then
+            select type (v => this%r_val_dyn)
+            type is (real)
+                val = v
+            class default
+                error stop "get_right_real type mismatch in dynamic storage"
+            end select
         else
             error stop "get_right_real called on wrong type"
         end if
@@ -561,7 +508,7 @@ contains
         real, intent(in) :: val
         call this%clear_left()
         call this%clear_right()
-        this%l_real = val
+        this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = TYPE_REAL
     end subroutine set_left_real
     subroutine set_right_real(this, val)
@@ -569,14 +516,21 @@ contains
         real, intent(in) :: val
         call this%clear_left()
         call this%clear_right()
-        this%r_real = val
+        this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_REAL
     end subroutine set_right_real
     function get_left_r64(this) result(val)
         class(either), intent(in) :: this
         real(real64) :: val
         if (this%active_l == TYPE_R64) then
-            val = this%l_r64
+            val = transfer(this%l_bytes, val)
+        else if (this%active_l == TYPE_DYN) then
+            select type (v => this%l_val_dyn)
+            type is (real(real64))
+                val = v
+            class default
+                error stop "get_left_r64 type mismatch in dynamic storage"
+            end select
         else
             error stop "get_left_r64 called on wrong type"
         end if
@@ -585,7 +539,14 @@ contains
         class(either), intent(in) :: this
         real(real64) :: val
         if (this%active_r == TYPE_R64) then
-            val = this%r_r64
+            val = transfer(this%r_bytes, val)
+        else if (this%active_r == TYPE_DYN) then
+            select type (v => this%r_val_dyn)
+            type is (real(real64))
+                val = v
+            class default
+                error stop "get_right_r64 type mismatch in dynamic storage"
+            end select
         else
             error stop "get_right_r64 called on wrong type"
         end if
@@ -595,7 +556,7 @@ contains
         real(real64), intent(in) :: val
         call this%clear_left()
         call this%clear_right()
-        this%l_r64 = val
+        this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = TYPE_R64
     end subroutine set_left_r64
     subroutine set_right_r64(this, val)
@@ -603,14 +564,21 @@ contains
         real(real64), intent(in) :: val
         call this%clear_left()
         call this%clear_right()
-        this%r_r64 = val
+        this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_R64
     end subroutine set_right_r64
     function get_left_log(this) result(val)
         class(either), intent(in) :: this
         logical :: val
         if (this%active_l == TYPE_LOG) then
-            val = this%l_log
+            val = transfer(this%l_bytes, val)
+        else if (this%active_l == TYPE_DYN) then
+            select type (v => this%l_val_dyn)
+            type is (logical)
+                val = v
+            class default
+                error stop "get_left_log type mismatch in dynamic storage"
+            end select
         else
             error stop "get_left_log called on wrong type"
         end if
@@ -619,7 +587,14 @@ contains
         class(either), intent(in) :: this
         logical :: val
         if (this%active_r == TYPE_LOG) then
-            val = this%r_log
+            val = transfer(this%r_bytes, val)
+        else if (this%active_r == TYPE_DYN) then
+            select type (v => this%r_val_dyn)
+            type is (logical)
+                val = v
+            class default
+                error stop "get_right_log type mismatch in dynamic storage"
+            end select
         else
             error stop "get_right_log called on wrong type"
         end if
@@ -629,7 +604,7 @@ contains
         logical, intent(in) :: val
         call this%clear_left()
         call this%clear_right()
-        this%l_log = val
+        this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = TYPE_LOG
     end subroutine set_left_log
     subroutine set_right_log(this, val)
@@ -637,14 +612,21 @@ contains
         logical, intent(in) :: val
         call this%clear_left()
         call this%clear_right()
-        this%r_log = val
+        this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_LOG
     end subroutine set_right_log
     function get_left_cpx(this) result(val)
         class(either), intent(in) :: this
         complex :: val
         if (this%active_l == TYPE_CPX) then
-            val = this%l_cpx
+            val = transfer(this%l_bytes, val)
+        else if (this%active_l == TYPE_DYN) then
+            select type (v => this%l_val_dyn)
+            type is (complex)
+                val = v
+            class default
+                error stop "get_left_cpx type mismatch in dynamic storage"
+            end select
         else
             error stop "get_left_cpx called on wrong type"
         end if
@@ -653,7 +635,14 @@ contains
         class(either), intent(in) :: this
         complex :: val
         if (this%active_r == TYPE_CPX) then
-            val = this%r_cpx
+            val = transfer(this%r_bytes, val)
+        else if (this%active_r == TYPE_DYN) then
+            select type (v => this%r_val_dyn)
+            type is (complex)
+                val = v
+            class default
+                error stop "get_right_cpx type mismatch in dynamic storage"
+            end select
         else
             error stop "get_right_cpx called on wrong type"
         end if
@@ -663,7 +652,7 @@ contains
         complex, intent(in) :: val
         call this%clear_left()
         call this%clear_right()
-        this%l_cpx = val
+        this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = TYPE_CPX
     end subroutine set_left_cpx
     subroutine set_right_cpx(this, val)
@@ -671,14 +660,21 @@ contains
         complex, intent(in) :: val
         call this%clear_left()
         call this%clear_right()
-        this%r_cpx = val
+        this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_CPX
     end subroutine set_right_cpx
     function get_left_c64(this) result(val)
         class(either), intent(in) :: this
         complex(real64) :: val
         if (this%active_l == TYPE_C64) then
-            val = this%l_c64
+            val = transfer(this%l_bytes, val)
+        else if (this%active_l == TYPE_DYN) then
+            select type (v => this%l_val_dyn)
+            type is (complex(real64))
+                val = v
+            class default
+                error stop "get_left_c64 type mismatch in dynamic storage"
+            end select
         else
             error stop "get_left_c64 called on wrong type"
         end if
@@ -687,7 +683,14 @@ contains
         class(either), intent(in) :: this
         complex(real64) :: val
         if (this%active_r == TYPE_C64) then
-            val = this%r_c64
+            val = transfer(this%r_bytes, val)
+        else if (this%active_r == TYPE_DYN) then
+            select type (v => this%r_val_dyn)
+            type is (complex(real64))
+                val = v
+            class default
+                error stop "get_right_c64 type mismatch in dynamic storage"
+            end select
         else
             error stop "get_right_c64 called on wrong type"
         end if
@@ -697,7 +700,7 @@ contains
         complex(real64), intent(in) :: val
         call this%clear_left()
         call this%clear_right()
-        this%l_c64 = val
+        this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = TYPE_C64
     end subroutine set_left_c64
     subroutine set_right_c64(this, val)
@@ -705,7 +708,7 @@ contains
         complex(real64), intent(in) :: val
         call this%clear_left()
         call this%clear_right()
-        this%r_c64 = val
+        this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_C64
     end subroutine set_right_c64
 
