@@ -11,7 +11,8 @@ with EITHER_TEMPLATE_PATH.open("rt") as f:
 
 def generate_either():
     # Reverting to int8 storage as int64 proved slower for small types
-    type_constants = "    integer, parameter :: STORAGE_SIZE = 16\n"
+    # Storage size increased to 32 to support complex(real128) (16+16 bytes)
+    type_constants = "    integer, parameter :: STORAGE_SIZE = 32\n"
 
     # Define the union storage buffer with int8
     type_fields = "        integer(int8) :: l_bytes(STORAGE_SIZE)\n"

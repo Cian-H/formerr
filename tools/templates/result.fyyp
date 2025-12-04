@@ -1,9 +1,11 @@
 module formerr_result
     use formerr_either
     use stdlib_error, only: check
-    use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, real64
+    use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, real64, real128
     implicit none
     private
+
+    integer, parameter :: int128 = selected_int_kind(38)
 
     logical, parameter :: DO_CHECKS = .false.
 

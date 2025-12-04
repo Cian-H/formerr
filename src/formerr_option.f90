@@ -1,24 +1,32 @@
 module formerr_option
     use formerr_either
     use stdlib_error, only: check
-    use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, real64
+    use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, real64, real128
     implicit none
     private
+
+    integer, parameter :: int128 = selected_int_kind(38)
 
     logical, parameter :: DO_CHECKS = .false.
 
     public :: option, some, none, is_some, is_none, unwrap, unwrap_or
     public :: some_move, unwrap_move
-        public :: some_int
+    public :: some_int
     public :: some_i8
     public :: some_i16
+    public :: some_i32
     public :: some_i64
+    public :: some_i128
     public :: some_real
+    public :: some_r32
     public :: some_r64
+    public :: some_r128
+    public :: some_r8
+    public :: some_r16
     public :: some_log
     public :: some_cpx
     public :: some_c64
-
+    public :: some_c128
 
     type :: unit_type
     end type unit_type
@@ -30,24 +38,38 @@ module formerr_option
         procedure :: unwrap
         procedure :: unwrap_or
         procedure :: unwrap_move
-                procedure :: unwrap_int
+        procedure :: unwrap_int
         procedure :: unwrap_or_int
         procedure :: unwrap_i8
         procedure :: unwrap_or_i8
         procedure :: unwrap_i16
         procedure :: unwrap_or_i16
+        procedure :: unwrap_i32
+        procedure :: unwrap_or_i32
         procedure :: unwrap_i64
         procedure :: unwrap_or_i64
+        procedure :: unwrap_i128
+        procedure :: unwrap_or_i128
         procedure :: unwrap_real
         procedure :: unwrap_or_real
+        procedure :: unwrap_r32
+        procedure :: unwrap_or_r32
         procedure :: unwrap_r64
         procedure :: unwrap_or_r64
+        procedure :: unwrap_r128
+        procedure :: unwrap_or_r128
+        procedure :: unwrap_r8
+        procedure :: unwrap_or_r8
+        procedure :: unwrap_r16
+        procedure :: unwrap_or_r16
         procedure :: unwrap_log
         procedure :: unwrap_or_log
         procedure :: unwrap_cpx
         procedure :: unwrap_or_cpx
         procedure :: unwrap_c64
         procedure :: unwrap_or_c64
+        procedure :: unwrap_c128
+        procedure :: unwrap_or_c128
 
     end type option
 
@@ -115,7 +137,7 @@ contains
         if (DO_CHECKS) call check(this%is_some(), "unwrap_move called on None value")
 
         ! 1. Prepare the None state (Unit type)
-        allocate(temp_none, source=u)
+        allocate (temp_none, source=u)
 
         ! 2. Perform the swap
         ! Move the Right (Some) value to dest
@@ -126,7 +148,7 @@ contains
     end subroutine unwrap_move
 
     ! -- Specialized Implementations --
-    
+
     pure elemental function some_int(val) result(res) !GCC$ attributes always_inline :: some_int
         integer, intent(in) :: val
         type(option) :: res
@@ -208,6 +230,33 @@ contains
         end if
     end function unwrap_or_i16
 
+    pure elemental function some_i32(val) result(res) !GCC$ attributes always_inline :: some_i32
+        integer(int32), intent(in) :: val
+        type(option) :: res
+        call res%set_right_i32(val)
+    end function some_i32
+
+    pure elemental function unwrap_i32(this) result(val) !GCC$ attributes always_inline :: unwrap_i32
+        class(option), intent(in) :: this
+        integer(int32) :: val
+        if (this%is_none()) then
+            if (DO_CHECKS) error stop "unwrap_i32 called on None value"
+        end if
+        ! We call the specialized getter from either
+        val = this%get_right_i32()
+    end function unwrap_i32
+
+    pure elemental function unwrap_or_i32(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_i32
+        class(option), intent(in) :: this
+        integer(int32), intent(in) :: default_val
+        integer(int32) :: val
+        if (this%is_some()) then
+            val = this%get_right_i32()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_i32
+
     pure elemental function some_i64(val) result(res) !GCC$ attributes always_inline :: some_i64
         integer(int64), intent(in) :: val
         type(option) :: res
@@ -234,6 +283,33 @@ contains
             val = default_val
         end if
     end function unwrap_or_i64
+
+    pure elemental function some_i128(val) result(res) !GCC$ attributes always_inline :: some_i128
+        integer(int128), intent(in) :: val
+        type(option) :: res
+        call res%set_right_i128(val)
+    end function some_i128
+
+    pure elemental function unwrap_i128(this) result(val) !GCC$ attributes always_inline :: unwrap_i128
+        class(option), intent(in) :: this
+        integer(int128) :: val
+        if (this%is_none()) then
+            if (DO_CHECKS) error stop "unwrap_i128 called on None value"
+        end if
+        ! We call the specialized getter from either
+        val = this%get_right_i128()
+    end function unwrap_i128
+
+    pure elemental function unwrap_or_i128(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_i128
+        class(option), intent(in) :: this
+        integer(int128), intent(in) :: default_val
+        integer(int128) :: val
+        if (this%is_some()) then
+            val = this%get_right_i128()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_i128
 
     pure elemental function some_real(val) result(res) !GCC$ attributes always_inline :: some_real
         real, intent(in) :: val
@@ -262,6 +338,33 @@ contains
         end if
     end function unwrap_or_real
 
+    pure elemental function some_r32(val) result(res) !GCC$ attributes always_inline :: some_r32
+        real(real32), intent(in) :: val
+        type(option) :: res
+        call res%set_right_r32(val)
+    end function some_r32
+
+    pure elemental function unwrap_r32(this) result(val) !GCC$ attributes always_inline :: unwrap_r32
+        class(option), intent(in) :: this
+        real(real32) :: val
+        if (this%is_none()) then
+            if (DO_CHECKS) error stop "unwrap_r32 called on None value"
+        end if
+        ! We call the specialized getter from either
+        val = this%get_right_r32()
+    end function unwrap_r32
+
+    pure elemental function unwrap_or_r32(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_r32
+        class(option), intent(in) :: this
+        real(real32), intent(in) :: default_val
+        real(real32) :: val
+        if (this%is_some()) then
+            val = this%get_right_r32()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_r32
+
     pure elemental function some_r64(val) result(res) !GCC$ attributes always_inline :: some_r64
         real(real64), intent(in) :: val
         type(option) :: res
@@ -288,6 +391,87 @@ contains
             val = default_val
         end if
     end function unwrap_or_r64
+
+    pure elemental function some_r128(val) result(res) !GCC$ attributes always_inline :: some_r128
+        real(real128), intent(in) :: val
+        type(option) :: res
+        call res%set_right_r128(val)
+    end function some_r128
+
+    pure elemental function unwrap_r128(this) result(val) !GCC$ attributes always_inline :: unwrap_r128
+        class(option), intent(in) :: this
+        real(real128) :: val
+        if (this%is_none()) then
+            if (DO_CHECKS) error stop "unwrap_r128 called on None value"
+        end if
+        ! We call the specialized getter from either
+        val = this%get_right_r128()
+    end function unwrap_r128
+
+    pure elemental function unwrap_or_r128(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_r128
+        class(option), intent(in) :: this
+        real(real128), intent(in) :: default_val
+        real(real128) :: val
+        if (this%is_some()) then
+            val = this%get_right_r128()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_r128
+
+    pure elemental function some_r8(val) result(res) !GCC$ attributes always_inline :: some_r8
+        real(8), intent(in) :: val
+        type(option) :: res
+        call res%set_right_r8(val)
+    end function some_r8
+
+    pure elemental function unwrap_r8(this) result(val) !GCC$ attributes always_inline :: unwrap_r8
+        class(option), intent(in) :: this
+        real(8) :: val
+        if (this%is_none()) then
+            if (DO_CHECKS) error stop "unwrap_r8 called on None value"
+        end if
+        ! We call the specialized getter from either
+        val = this%get_right_r8()
+    end function unwrap_r8
+
+    pure elemental function unwrap_or_r8(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_r8
+        class(option), intent(in) :: this
+        real(8), intent(in) :: default_val
+        real(8) :: val
+        if (this%is_some()) then
+            val = this%get_right_r8()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_r8
+
+    pure elemental function some_r16(val) result(res) !GCC$ attributes always_inline :: some_r16
+        real(16), intent(in) :: val
+        type(option) :: res
+        call res%set_right_r16(val)
+    end function some_r16
+
+    pure elemental function unwrap_r16(this) result(val) !GCC$ attributes always_inline :: unwrap_r16
+        class(option), intent(in) :: this
+        real(16) :: val
+        if (this%is_none()) then
+            if (DO_CHECKS) error stop "unwrap_r16 called on None value"
+        end if
+        ! We call the specialized getter from either
+        val = this%get_right_r16()
+    end function unwrap_r16
+
+    pure elemental function unwrap_or_r16(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_r16
+        class(option), intent(in) :: this
+        real(16), intent(in) :: default_val
+        real(16) :: val
+        if (this%is_some()) then
+            val = this%get_right_r16()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_r16
 
     pure elemental function some_log(val) result(res) !GCC$ attributes always_inline :: some_log
         logical, intent(in) :: val
@@ -370,5 +554,31 @@ contains
         end if
     end function unwrap_or_c64
 
+    pure elemental function some_c128(val) result(res) !GCC$ attributes always_inline :: some_c128
+        complex(real128), intent(in) :: val
+        type(option) :: res
+        call res%set_right_c128(val)
+    end function some_c128
+
+    pure elemental function unwrap_c128(this) result(val) !GCC$ attributes always_inline :: unwrap_c128
+        class(option), intent(in) :: this
+        complex(real128) :: val
+        if (this%is_none()) then
+            if (DO_CHECKS) error stop "unwrap_c128 called on None value"
+        end if
+        ! We call the specialized getter from either
+        val = this%get_right_c128()
+    end function unwrap_c128
+
+    pure elemental function unwrap_or_c128(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_c128
+        class(option), intent(in) :: this
+        complex(real128), intent(in) :: default_val
+        complex(real128) :: val
+        if (this%is_some()) then
+            val = this%get_right_c128()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_c128
 
 end module formerr_option
