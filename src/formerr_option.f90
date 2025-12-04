@@ -7,7 +7,7 @@ module formerr_option
 
     public :: option, some, none, is_some, is_none, unwrap, unwrap_or
     public :: some_move, unwrap_move
-        public :: some_int
+    public :: some_int
     public :: some_i8
     public :: some_i16
     public :: some_i64
@@ -16,7 +16,6 @@ module formerr_option
     public :: some_log
     public :: some_cpx
     public :: some_c64
-
 
     type :: unit_type
     end type unit_type
@@ -28,7 +27,7 @@ module formerr_option
         procedure :: unwrap
         procedure :: unwrap_or
         procedure :: unwrap_move
-                procedure :: unwrap_int
+        procedure :: unwrap_int
         procedure :: unwrap_i8
         procedure :: unwrap_i16
         procedure :: unwrap_i64
@@ -104,7 +103,7 @@ contains
         call check(this%is_some(), "unwrap_move called on None value")
 
         ! 1. Prepare the None state (Unit type)
-        allocate(temp_none, source=u)
+        allocate (temp_none, source=u)
 
         ! 2. Perform the swap
         ! Move the Right (Some) value to dest
@@ -115,7 +114,7 @@ contains
     end subroutine unwrap_move
 
     ! -- Specialized Implementations --
-    
+
     function some_int(val) result(res)
         integer, intent(in) :: val
         type(option) :: res
@@ -241,6 +240,5 @@ contains
         ! We call the specialized getter from either
         val = this%get_right_c64()
     end function unwrap_c64
-
 
 end module formerr_option

@@ -4,12 +4,11 @@ module formerr_either
     private
 
     public :: either, new_left, new_right
-    
 
     ! Type constants
     integer, parameter :: TYPE_NONE = 0
     integer, parameter :: TYPE_DYN = 1
-        integer, parameter :: TYPE_INT = 2
+    integer, parameter :: TYPE_INT = 2
     integer, parameter :: TYPE_I8 = 3
     integer, parameter :: TYPE_I16 = 4
     integer, parameter :: TYPE_I64 = 5
@@ -18,7 +17,6 @@ module formerr_either
     integer, parameter :: TYPE_LOG = 8
     integer, parameter :: TYPE_CPX = 9
     integer, parameter :: TYPE_C64 = 10
-
 
     type :: either
         private
@@ -30,7 +28,7 @@ module formerr_either
         class(*), allocatable :: r_val_dyn
 
         ! Monomorphised storage (embedded, non-allocatable)
-                integer :: l_int
+        integer :: l_int
         integer :: r_int
         integer(int8) :: l_i8
         integer(int8) :: r_i8
@@ -67,7 +65,7 @@ module formerr_either
         procedure, private :: clear_right
 
         ! Specialized Procedures
-                procedure :: get_left_int
+        procedure :: get_left_int
         procedure :: get_right_int
         procedure :: set_left_int
         procedure :: set_right_int
@@ -150,14 +148,14 @@ contains
 
     subroutine clear_left(this)
         class(either), intent(inout) :: this
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
+        if (allocated(this%l_val_dyn)) deallocate (this%l_val_dyn)
         ! Monomorphised fields are embedded, no deallocation needed
         this%active_l = TYPE_NONE
     end subroutine clear_left
 
     subroutine clear_right(this)
         class(either), intent(inout) :: this
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        if (allocated(this%r_val_dyn)) deallocate (this%r_val_dyn)
         ! Monomorphised fields are embedded, no deallocation needed
         this%active_r = TYPE_NONE
     end subroutine clear_right
@@ -170,7 +168,7 @@ contains
         select case (this%active_l)
         case (TYPE_DYN)
             if (allocated(this%l_val_dyn)) ptr => this%l_val_dyn
-                case (TYPE_INT)
+        case (TYPE_INT)
             ptr => this%l_int
         case (TYPE_I8)
             ptr => this%l_i8
@@ -200,7 +198,7 @@ contains
         select case (this%active_r)
         case (TYPE_DYN)
             if (allocated(this%r_val_dyn)) ptr => this%r_val_dyn
-                case (TYPE_INT)
+        case (TYPE_INT)
             ptr => this%r_int
         case (TYPE_I8)
             ptr => this%r_i8
@@ -230,8 +228,8 @@ contains
         call this%clear_left()
         call this%clear_right()
 
-        select type(val)
-                type is (integer)
+        select type (val)
+        type is (integer)
             this%l_int = val
             this%active_l = TYPE_INT
         type is (integer(int8))
@@ -260,7 +258,7 @@ contains
             this%active_l = TYPE_C64
 
         class default
-            allocate(this%l_val_dyn, source=val)
+            allocate (this%l_val_dyn, source=val)
             this%active_l = TYPE_DYN
         end select
     end subroutine set_left
@@ -272,8 +270,8 @@ contains
         call this%clear_left()
         call this%clear_right()
 
-        select type(val)
-                type is (integer)
+        select type (val)
+        type is (integer)
             this%r_int = val
             this%active_r = TYPE_INT
         type is (integer(int8))
@@ -302,7 +300,7 @@ contains
             this%active_r = TYPE_C64
 
         class default
-            allocate(this%r_val_dyn, source=val)
+            allocate (this%r_val_dyn, source=val)
             this%active_r = TYPE_DYN
         end select
     end subroutine set_right
@@ -317,8 +315,8 @@ contains
         ! If val is not allocated, do nothing (or error?)
         if (.not. allocated(val)) return
 
-        select type(val)
-                type is (integer)
+        select type (val)
+        type is (integer)
             this%l_int = val
             this%active_l = TYPE_INT
         type is (integer(int8))
@@ -352,7 +350,7 @@ contains
         end select
 
         ! Deallocate source 'val' if it was allocated (and not moved via move_alloc)
-        if (allocated(val)) deallocate(val)
+        if (allocated(val)) deallocate (val)
 
     end subroutine move_left
 
@@ -365,8 +363,8 @@ contains
 
         if (.not. allocated(val)) return
 
-        select type(val)
-                type is (integer)
+        select type (val)
+        type is (integer)
             this%r_int = val
             this%active_r = TYPE_INT
         type is (integer(int8))
@@ -399,11 +397,11 @@ contains
             this%active_r = TYPE_DYN
         end select
 
-        if (allocated(val)) deallocate(val)
+        if (allocated(val)) deallocate (val)
     end subroutine move_right
 
     ! -- Specialized Implementations --
-    
+
     function get_left_int(this) result(val)
         class(either), intent(in) :: this
         integer :: val

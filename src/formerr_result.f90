@@ -7,7 +7,7 @@ module formerr_result
 
     public :: result_type, ok, err, is_ok, is_err, unwrap, unwrap_err, unwrap_or
     public :: ok_move, err_move, unwrap_move_to_err, unsafe_unwrap_move
-        public :: ok_int, err_int
+    public :: ok_int, err_int
     public :: ok_i8, err_i8
     public :: ok_i16, err_i16
     public :: ok_i64, err_i64
@@ -16,7 +16,6 @@ module formerr_result
     public :: ok_log, err_log
     public :: ok_cpx, err_cpx
     public :: ok_c64, err_c64
-
 
     type, extends(either) :: result_type
     contains
@@ -27,7 +26,7 @@ module formerr_result
         procedure :: unwrap_or
         procedure :: unwrap_move_to_err
         procedure :: unsafe_unwrap_move
-                procedure :: unwrap_int
+        procedure :: unwrap_int
         procedure :: unwrap_err_int
         procedure :: unwrap_i8
         procedure :: unwrap_err_i8
@@ -127,7 +126,7 @@ contains
         call check(this%is_ok(), "unwrap_move_to_err called on Err value")
 
         ! 1. Allocate the replacement error first to ensure safety if alloc fails
-        allocate(temp_err, source=replacement_err)
+        allocate (temp_err, source=replacement_err)
 
         ! 2. Perform the swap
         ! Move the Right (Ok) value to dest (leaves Right unallocated)
@@ -151,7 +150,7 @@ contains
     end subroutine unsafe_unwrap_move
 
     ! -- Specialized Implementations --
-    
+
     function ok_int(val) result(res)
         integer, intent(in) :: val
         type(result_type) :: res
@@ -385,6 +384,5 @@ contains
         if (this%is_ok()) error stop "unwrap_err_c64 called on Ok value"
         val = this%get_left_c64()
     end function unwrap_err_c64
-
 
 end module formerr_result
