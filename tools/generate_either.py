@@ -59,7 +59,7 @@ def generate_either():
 
         # GET LEFT
         specialized_impls += f"""
-    pure elemental function get_left_{t_suffix}(this) result(val)
+    pure elemental function get_left_{t_suffix}(this) result(val) !GCC$ attributes always_inline :: get_left_{t_suffix}
         class(either), intent(in) :: this
         {t_type} :: val
         if (this%active_l == {const_name}) then
@@ -78,7 +78,7 @@ def generate_either():
 
         # GET RIGHT
         specialized_impls += f"""
-    pure elemental function get_right_{t_suffix}(this) result(val)
+    pure elemental function get_right_{t_suffix}(this) result(val) !GCC$ attributes always_inline :: get_right_{t_suffix}
         class(either), intent(in) :: this
         {t_type} :: val
         if (this%active_r == {const_name}) then
@@ -97,22 +97,30 @@ def generate_either():
 
         # SET LEFT
         specialized_impls += f"""
-    pure elemental subroutine set_left_{t_suffix}(this, val)
+    pure elemental subroutine set_left_{t_suffix}(this, val) !GCC$ attributes always_inline :: set_left_{t_suffix}
         class(either), intent(inout) :: this
         {t_type}, intent(in) :: val
-        call this%clear_left()
-        call this%clear_right()
+        ! Inlined clear_left (optimized: no active_l assignment)
+        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
+        ! Inlined clear_right
+        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        this%active_r = TYPE_NONE
+        
         this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = {const_name}
     end subroutine set_left_{t_suffix}"""
 
         # SET RIGHT
         specialized_impls += f"""
-    pure elemental subroutine set_right_{t_suffix}(this, val)
+    pure elemental subroutine set_right_{t_suffix}(this, val) !GCC$ attributes always_inline :: set_right_{t_suffix}
         class(either), intent(inout) :: this
         {t_type}, intent(in) :: val
-        call this%clear_left()
-        call this%clear_right()
+        ! Inlined clear_left
+        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
+        this%active_l = TYPE_NONE
+        ! Inlined clear_right (optimized: no active_r assignment)
+        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = {const_name}
     end subroutine set_right_{t_suffix}"""

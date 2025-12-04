@@ -7,7 +7,7 @@ module formerr_option
 
     public :: option, some, none, is_some, is_none, unwrap, unwrap_or
     public :: some_move, unwrap_move
-    public :: some_int
+        public :: some_int
     public :: some_i8
     public :: some_i16
     public :: some_i64
@@ -16,6 +16,7 @@ module formerr_option
     public :: some_log
     public :: some_cpx
     public :: some_c64
+
 
     type :: unit_type
     end type unit_type
@@ -27,7 +28,7 @@ module formerr_option
         procedure :: unwrap
         procedure :: unwrap_or
         procedure :: unwrap_move
-        procedure :: unwrap_int
+                procedure :: unwrap_int
         procedure :: unwrap_i8
         procedure :: unwrap_i16
         procedure :: unwrap_i64
@@ -103,7 +104,7 @@ contains
         call check(this%is_some(), "unwrap_move called on None value")
 
         ! 1. Prepare the None state (Unit type)
-        allocate (temp_none, source=u)
+        allocate(temp_none, source=u)
 
         ! 2. Perform the swap
         ! Move the Right (Some) value to dest
@@ -114,14 +115,14 @@ contains
     end subroutine unwrap_move
 
     ! -- Specialized Implementations --
-
-    pure elemental function some_int(val) result(res)
+    
+    pure elemental function some_int(val) result(res) !GCC$ attributes always_inline :: some_int
         integer, intent(in) :: val
         type(option) :: res
         call res%set_right_int(val)
     end function some_int
 
-    pure elemental function unwrap_int(this) result(val)
+    pure elemental function unwrap_int(this) result(val) !GCC$ attributes always_inlin :: unwrap_int
         class(option), intent(in) :: this
         integer :: val
         if (this%is_none()) error stop "unwrap_int called on None value"
@@ -129,13 +130,13 @@ contains
         val = this%get_right_int()
     end function unwrap_int
 
-    pure elemental function some_i8(val) result(res)
+    pure elemental function some_i8(val) result(res) !GCC$ attributes always_inline :: some_i8
         integer(int8), intent(in) :: val
         type(option) :: res
         call res%set_right_i8(val)
     end function some_i8
 
-    pure elemental function unwrap_i8(this) result(val)
+    pure elemental function unwrap_i8(this) result(val) !GCC$ attributes always_inlin :: unwrap_i8
         class(option), intent(in) :: this
         integer(int8) :: val
         if (this%is_none()) error stop "unwrap_i8 called on None value"
@@ -143,13 +144,13 @@ contains
         val = this%get_right_i8()
     end function unwrap_i8
 
-    pure elemental function some_i16(val) result(res)
+    pure elemental function some_i16(val) result(res) !GCC$ attributes always_inline :: some_i16
         integer(int16), intent(in) :: val
         type(option) :: res
         call res%set_right_i16(val)
     end function some_i16
 
-    pure elemental function unwrap_i16(this) result(val)
+    pure elemental function unwrap_i16(this) result(val) !GCC$ attributes always_inlin :: unwrap_i16
         class(option), intent(in) :: this
         integer(int16) :: val
         if (this%is_none()) error stop "unwrap_i16 called on None value"
@@ -157,13 +158,13 @@ contains
         val = this%get_right_i16()
     end function unwrap_i16
 
-    pure elemental function some_i64(val) result(res)
+    pure elemental function some_i64(val) result(res) !GCC$ attributes always_inline :: some_i64
         integer(int64), intent(in) :: val
         type(option) :: res
         call res%set_right_i64(val)
     end function some_i64
 
-    pure elemental function unwrap_i64(this) result(val)
+    pure elemental function unwrap_i64(this) result(val) !GCC$ attributes always_inlin :: unwrap_i64
         class(option), intent(in) :: this
         integer(int64) :: val
         if (this%is_none()) error stop "unwrap_i64 called on None value"
@@ -171,13 +172,13 @@ contains
         val = this%get_right_i64()
     end function unwrap_i64
 
-    pure elemental function some_real(val) result(res)
+    pure elemental function some_real(val) result(res) !GCC$ attributes always_inline :: some_real
         real, intent(in) :: val
         type(option) :: res
         call res%set_right_real(val)
     end function some_real
 
-    pure elemental function unwrap_real(this) result(val)
+    pure elemental function unwrap_real(this) result(val) !GCC$ attributes always_inlin :: unwrap_real
         class(option), intent(in) :: this
         real :: val
         if (this%is_none()) error stop "unwrap_real called on None value"
@@ -185,13 +186,13 @@ contains
         val = this%get_right_real()
     end function unwrap_real
 
-    pure elemental function some_r64(val) result(res)
+    pure elemental function some_r64(val) result(res) !GCC$ attributes always_inline :: some_r64
         real(real64), intent(in) :: val
         type(option) :: res
         call res%set_right_r64(val)
     end function some_r64
 
-    pure elemental function unwrap_r64(this) result(val)
+    pure elemental function unwrap_r64(this) result(val) !GCC$ attributes always_inlin :: unwrap_r64
         class(option), intent(in) :: this
         real(real64) :: val
         if (this%is_none()) error stop "unwrap_r64 called on None value"
@@ -199,13 +200,13 @@ contains
         val = this%get_right_r64()
     end function unwrap_r64
 
-    pure elemental function some_log(val) result(res)
+    pure elemental function some_log(val) result(res) !GCC$ attributes always_inline :: some_log
         logical, intent(in) :: val
         type(option) :: res
         call res%set_right_log(val)
     end function some_log
 
-    pure elemental function unwrap_log(this) result(val)
+    pure elemental function unwrap_log(this) result(val) !GCC$ attributes always_inlin :: unwrap_log
         class(option), intent(in) :: this
         logical :: val
         if (this%is_none()) error stop "unwrap_log called on None value"
@@ -213,13 +214,13 @@ contains
         val = this%get_right_log()
     end function unwrap_log
 
-    pure elemental function some_cpx(val) result(res)
+    pure elemental function some_cpx(val) result(res) !GCC$ attributes always_inline :: some_cpx
         complex, intent(in) :: val
         type(option) :: res
         call res%set_right_cpx(val)
     end function some_cpx
 
-    pure elemental function unwrap_cpx(this) result(val)
+    pure elemental function unwrap_cpx(this) result(val) !GCC$ attributes always_inlin :: unwrap_cpx
         class(option), intent(in) :: this
         complex :: val
         if (this%is_none()) error stop "unwrap_cpx called on None value"
@@ -227,18 +228,19 @@ contains
         val = this%get_right_cpx()
     end function unwrap_cpx
 
-    pure elemental function some_c64(val) result(res)
+    pure elemental function some_c64(val) result(res) !GCC$ attributes always_inline :: some_c64
         complex(real64), intent(in) :: val
         type(option) :: res
         call res%set_right_c64(val)
     end function some_c64
 
-    pure elemental function unwrap_c64(this) result(val)
+    pure elemental function unwrap_c64(this) result(val) !GCC$ attributes always_inlin :: unwrap_c64
         class(option), intent(in) :: this
         complex(real64) :: val
         if (this%is_none()) error stop "unwrap_c64 called on None value"
         ! We call the specialized getter from either
         val = this%get_right_c64()
     end function unwrap_c64
+
 
 end module formerr_option

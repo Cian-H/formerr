@@ -26,7 +26,7 @@ def generate_option():
 
         # some_{suffix}
         specialized_impls += f"""
-    pure elemental function some_{t_suffix}(val) result(res)
+    pure elemental function some_{t_suffix}(val) result(res) !GCC$ attributes always_inline :: some_{t_suffix}
         {t_type}, intent(in) :: val
         type(option) :: res
         call res%set_right_{t_suffix}(val)
@@ -35,7 +35,7 @@ def generate_option():
 
         # unwrap_{suffix}
         specialized_impls += f"""
-    pure elemental function unwrap_{t_suffix}(this) result(val)
+    pure elemental function unwrap_{t_suffix}(this) result(val) !GCC$ attributes always_inline :: unwrap_{t_suffix}
         class(option), intent(in) :: this
         {t_type} :: val
         if (this%is_none()) error stop "unwrap_{t_suffix} called on None value"
