@@ -23,6 +23,7 @@ def generate_option():
 
         # Type bound procedures
         type_bound_procedures += f"        procedure :: unwrap_{t_suffix}\n"
+        type_bound_procedures += f"        procedure :: unwrap_or_{t_suffix}\n"
 
         # some_{suffix}
         specialized_impls += f"""
@@ -44,6 +45,20 @@ def generate_option():
         ! We call the specialized getter from either
         val = this%get_right_{t_suffix}()
     end function unwrap_{t_suffix}
+"""
+
+        # unwrap_or_{suffix}
+        specialized_impls += f"""
+    pure elemental function unwrap_or_{t_suffix}(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_{t_suffix}
+        class(option), intent(in) :: this
+        {t_type}, intent(in) :: default_val
+        {t_type} :: val
+        if (this%is_some()) then
+            val = this%get_right_{t_suffix}()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_{t_suffix}
 """
 
     content = OPTION_TEMPLATE.format(

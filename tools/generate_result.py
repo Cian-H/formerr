@@ -24,6 +24,7 @@ def generate_result():
         # Type bound procedures
         type_bound_procedures += f"        procedure :: unwrap_{t_suffix}\n"
         type_bound_procedures += f"        procedure :: unwrap_err_{t_suffix}\n"
+        type_bound_procedures += f"        procedure :: unwrap_or_{t_suffix}\n"
 
         # ok_{suffix}
         specialized_impls += f"""
@@ -64,6 +65,20 @@ def generate_result():
         end if
         val = this%get_left_{t_suffix}()
     end function unwrap_err_{t_suffix}
+"""
+
+        # unwrap_or_{suffix}
+        specialized_impls += f"""
+    pure elemental function unwrap_or_{t_suffix}(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_{t_suffix}
+        class(result_type), intent(in) :: this
+        {t_type}, intent(in) :: default_val
+        {t_type} :: val
+        if (this%is_ok()) then
+            val = this%get_right_{t_suffix}()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_{t_suffix}
 """
 
     content = RESULT_TEMPLATE.format(

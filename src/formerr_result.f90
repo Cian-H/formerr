@@ -31,22 +31,31 @@ module formerr_result
         procedure :: unsafe_unwrap_move
                 procedure :: unwrap_int
         procedure :: unwrap_err_int
+        procedure :: unwrap_or_int
         procedure :: unwrap_i8
         procedure :: unwrap_err_i8
+        procedure :: unwrap_or_i8
         procedure :: unwrap_i16
         procedure :: unwrap_err_i16
+        procedure :: unwrap_or_i16
         procedure :: unwrap_i64
         procedure :: unwrap_err_i64
+        procedure :: unwrap_or_i64
         procedure :: unwrap_real
         procedure :: unwrap_err_real
+        procedure :: unwrap_or_real
         procedure :: unwrap_r64
         procedure :: unwrap_err_r64
+        procedure :: unwrap_or_r64
         procedure :: unwrap_log
         procedure :: unwrap_err_log
+        procedure :: unwrap_or_log
         procedure :: unwrap_cpx
         procedure :: unwrap_err_cpx
+        procedure :: unwrap_or_cpx
         procedure :: unwrap_c64
         procedure :: unwrap_err_c64
+        procedure :: unwrap_or_c64
 
     end type result_type
 
@@ -184,6 +193,17 @@ contains
         val = this%get_left_int()
     end function unwrap_err_int
 
+    pure elemental function unwrap_or_int(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_int
+        class(result_type), intent(in) :: this
+        integer, intent(in) :: default_val
+        integer :: val
+        if (this%is_ok()) then
+            val = this%get_right_int()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_int
+
     pure elemental function ok_i8(val) result(res) !GCC$ attributes always_inline :: ok_i8
         integer(int8), intent(in) :: val
         type(result_type) :: res
@@ -213,6 +233,17 @@ contains
         end if
         val = this%get_left_i8()
     end function unwrap_err_i8
+
+    pure elemental function unwrap_or_i8(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_i8
+        class(result_type), intent(in) :: this
+        integer(int8), intent(in) :: default_val
+        integer(int8) :: val
+        if (this%is_ok()) then
+            val = this%get_right_i8()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_i8
 
     pure elemental function ok_i16(val) result(res) !GCC$ attributes always_inline :: ok_i16
         integer(int16), intent(in) :: val
@@ -244,6 +275,17 @@ contains
         val = this%get_left_i16()
     end function unwrap_err_i16
 
+    pure elemental function unwrap_or_i16(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_i16
+        class(result_type), intent(in) :: this
+        integer(int16), intent(in) :: default_val
+        integer(int16) :: val
+        if (this%is_ok()) then
+            val = this%get_right_i16()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_i16
+
     pure elemental function ok_i64(val) result(res) !GCC$ attributes always_inline :: ok_i64
         integer(int64), intent(in) :: val
         type(result_type) :: res
@@ -273,6 +315,17 @@ contains
         end if
         val = this%get_left_i64()
     end function unwrap_err_i64
+
+    pure elemental function unwrap_or_i64(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_i64
+        class(result_type), intent(in) :: this
+        integer(int64), intent(in) :: default_val
+        integer(int64) :: val
+        if (this%is_ok()) then
+            val = this%get_right_i64()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_i64
 
     pure elemental function ok_real(val) result(res) !GCC$ attributes always_inline :: ok_real
         real, intent(in) :: val
@@ -304,6 +357,17 @@ contains
         val = this%get_left_real()
     end function unwrap_err_real
 
+    pure elemental function unwrap_or_real(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_real
+        class(result_type), intent(in) :: this
+        real, intent(in) :: default_val
+        real :: val
+        if (this%is_ok()) then
+            val = this%get_right_real()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_real
+
     pure elemental function ok_r64(val) result(res) !GCC$ attributes always_inline :: ok_r64
         real(real64), intent(in) :: val
         type(result_type) :: res
@@ -333,6 +397,17 @@ contains
         end if
         val = this%get_left_r64()
     end function unwrap_err_r64
+
+    pure elemental function unwrap_or_r64(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_r64
+        class(result_type), intent(in) :: this
+        real(real64), intent(in) :: default_val
+        real(real64) :: val
+        if (this%is_ok()) then
+            val = this%get_right_r64()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_r64
 
     pure elemental function ok_log(val) result(res) !GCC$ attributes always_inline :: ok_log
         logical, intent(in) :: val
@@ -364,6 +439,17 @@ contains
         val = this%get_left_log()
     end function unwrap_err_log
 
+    pure elemental function unwrap_or_log(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_log
+        class(result_type), intent(in) :: this
+        logical, intent(in) :: default_val
+        logical :: val
+        if (this%is_ok()) then
+            val = this%get_right_log()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_log
+
     pure elemental function ok_cpx(val) result(res) !GCC$ attributes always_inline :: ok_cpx
         complex, intent(in) :: val
         type(result_type) :: res
@@ -394,6 +480,17 @@ contains
         val = this%get_left_cpx()
     end function unwrap_err_cpx
 
+    pure elemental function unwrap_or_cpx(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_cpx
+        class(result_type), intent(in) :: this
+        complex, intent(in) :: default_val
+        complex :: val
+        if (this%is_ok()) then
+            val = this%get_right_cpx()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_cpx
+
     pure elemental function ok_c64(val) result(res) !GCC$ attributes always_inline :: ok_c64
         complex(real64), intent(in) :: val
         type(result_type) :: res
@@ -423,6 +520,17 @@ contains
         end if
         val = this%get_left_c64()
     end function unwrap_err_c64
+
+    pure elemental function unwrap_or_c64(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_c64
+        class(result_type), intent(in) :: this
+        complex(real64), intent(in) :: default_val
+        complex(real64) :: val
+        if (this%is_ok()) then
+            val = this%get_right_c64()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_c64
 
 
 end module formerr_result

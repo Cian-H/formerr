@@ -31,14 +31,23 @@ module formerr_option
         procedure :: unwrap_or
         procedure :: unwrap_move
                 procedure :: unwrap_int
+        procedure :: unwrap_or_int
         procedure :: unwrap_i8
+        procedure :: unwrap_or_i8
         procedure :: unwrap_i16
+        procedure :: unwrap_or_i16
         procedure :: unwrap_i64
+        procedure :: unwrap_or_i64
         procedure :: unwrap_real
+        procedure :: unwrap_or_real
         procedure :: unwrap_r64
+        procedure :: unwrap_or_r64
         procedure :: unwrap_log
+        procedure :: unwrap_or_log
         procedure :: unwrap_cpx
+        procedure :: unwrap_or_cpx
         procedure :: unwrap_c64
+        procedure :: unwrap_or_c64
 
     end type option
 
@@ -134,6 +143,17 @@ contains
         val = this%get_right_int()
     end function unwrap_int
 
+    pure elemental function unwrap_or_int(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_int
+        class(option), intent(in) :: this
+        integer, intent(in) :: default_val
+        integer :: val
+        if (this%is_some()) then
+            val = this%get_right_int()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_int
+
     pure elemental function some_i8(val) result(res) !GCC$ attributes always_inline :: some_i8
         integer(int8), intent(in) :: val
         type(option) :: res
@@ -149,6 +169,17 @@ contains
         ! We call the specialized getter from either
         val = this%get_right_i8()
     end function unwrap_i8
+
+    pure elemental function unwrap_or_i8(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_i8
+        class(option), intent(in) :: this
+        integer(int8), intent(in) :: default_val
+        integer(int8) :: val
+        if (this%is_some()) then
+            val = this%get_right_i8()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_i8
 
     pure elemental function some_i16(val) result(res) !GCC$ attributes always_inline :: some_i16
         integer(int16), intent(in) :: val
@@ -166,6 +197,17 @@ contains
         val = this%get_right_i16()
     end function unwrap_i16
 
+    pure elemental function unwrap_or_i16(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_i16
+        class(option), intent(in) :: this
+        integer(int16), intent(in) :: default_val
+        integer(int16) :: val
+        if (this%is_some()) then
+            val = this%get_right_i16()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_i16
+
     pure elemental function some_i64(val) result(res) !GCC$ attributes always_inline :: some_i64
         integer(int64), intent(in) :: val
         type(option) :: res
@@ -181,6 +223,17 @@ contains
         ! We call the specialized getter from either
         val = this%get_right_i64()
     end function unwrap_i64
+
+    pure elemental function unwrap_or_i64(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_i64
+        class(option), intent(in) :: this
+        integer(int64), intent(in) :: default_val
+        integer(int64) :: val
+        if (this%is_some()) then
+            val = this%get_right_i64()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_i64
 
     pure elemental function some_real(val) result(res) !GCC$ attributes always_inline :: some_real
         real, intent(in) :: val
@@ -198,6 +251,17 @@ contains
         val = this%get_right_real()
     end function unwrap_real
 
+    pure elemental function unwrap_or_real(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_real
+        class(option), intent(in) :: this
+        real, intent(in) :: default_val
+        real :: val
+        if (this%is_some()) then
+            val = this%get_right_real()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_real
+
     pure elemental function some_r64(val) result(res) !GCC$ attributes always_inline :: some_r64
         real(real64), intent(in) :: val
         type(option) :: res
@@ -213,6 +277,17 @@ contains
         ! We call the specialized getter from either
         val = this%get_right_r64()
     end function unwrap_r64
+
+    pure elemental function unwrap_or_r64(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_r64
+        class(option), intent(in) :: this
+        real(real64), intent(in) :: default_val
+        real(real64) :: val
+        if (this%is_some()) then
+            val = this%get_right_r64()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_r64
 
     pure elemental function some_log(val) result(res) !GCC$ attributes always_inline :: some_log
         logical, intent(in) :: val
@@ -230,6 +305,17 @@ contains
         val = this%get_right_log()
     end function unwrap_log
 
+    pure elemental function unwrap_or_log(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_log
+        class(option), intent(in) :: this
+        logical, intent(in) :: default_val
+        logical :: val
+        if (this%is_some()) then
+            val = this%get_right_log()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_log
+
     pure elemental function some_cpx(val) result(res) !GCC$ attributes always_inline :: some_cpx
         complex, intent(in) :: val
         type(option) :: res
@@ -246,6 +332,17 @@ contains
         val = this%get_right_cpx()
     end function unwrap_cpx
 
+    pure elemental function unwrap_or_cpx(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_cpx
+        class(option), intent(in) :: this
+        complex, intent(in) :: default_val
+        complex :: val
+        if (this%is_some()) then
+            val = this%get_right_cpx()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_cpx
+
     pure elemental function some_c64(val) result(res) !GCC$ attributes always_inline :: some_c64
         complex(real64), intent(in) :: val
         type(option) :: res
@@ -261,6 +358,17 @@ contains
         ! We call the specialized getter from either
         val = this%get_right_c64()
     end function unwrap_c64
+
+    pure elemental function unwrap_or_c64(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_c64
+        class(option), intent(in) :: this
+        complex(real64), intent(in) :: default_val
+        complex(real64) :: val
+        if (this%is_some()) then
+            val = this%get_right_c64()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_c64
 
 
 end module formerr_option
