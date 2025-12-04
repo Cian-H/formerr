@@ -10,9 +10,10 @@ with EITHER_TEMPLATE_PATH.open("rt") as f:
 
 
 def generate_either():
+    # Reverting to int8 storage as int64 proved slower for small types
     type_constants = "    integer, parameter :: STORAGE_SIZE = 16\n"
 
-    # Define the union storage buffer
+    # Define the union storage buffer with int8
     type_fields = "        integer(int8) :: l_bytes(STORAGE_SIZE)\n"
     type_fields += "        integer(int8) :: r_bytes(STORAGE_SIZE)\n"
 
@@ -47,13 +48,6 @@ def generate_either():
 
         get_right_cases += f"        case ({const_name})\n"
         get_right_cases += f'            if (DO_CHECKS) error stop "get_right (Generic) cannot return pointer to Specialized (Union) value ({t_type})."\n'
-
-        # NOTE: We leave set_left_cases/set_right_cases EMPTY.
-        # This forces Generic Set to fall through to `class default` (Dynamic allocation).
-        # This is necessary because we cannot trivially determine if a generic `val` is "small enough"
-        # or matches the specialized types without the `type is` blocks, but if we use `type is` blocks
-        # and assign to `l_bytes` via transfer, we lose the ability to return a pointer in `get_left` (Generic).
-        # So Generic Set -> Dynamic Storage. Specialized Set -> Union Storage.
 
         # Specialized Implementation Code
 
@@ -100,10 +94,10 @@ def generate_either():
     pure elemental subroutine set_left_{t_suffix}(this, val) !GCC$ attributes always_inline :: set_left_{t_suffix}
         class(either), intent(inout) :: this
         {t_type}, intent(in) :: val
-        ! Inlined clear_left (optimized: no active_l assignment)
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
-        ! Inlined clear_right
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
+        
         this%active_r = TYPE_NONE
         
         this%l_bytes = transfer(val, this%l_bytes)
@@ -115,11 +109,11 @@ def generate_either():
     pure elemental subroutine set_right_{t_suffix}(this, val) !GCC$ attributes always_inline :: set_right_{t_suffix}
         class(either), intent(inout) :: this
         {t_type}, intent(in) :: val
-        ! Inlined clear_left
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
         this%active_l = TYPE_NONE
-        ! Inlined clear_right (optimized: no active_r assignment)
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
         
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = {const_name}

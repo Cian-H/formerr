@@ -319,10 +319,10 @@ contains
     pure elemental subroutine set_left_int(this, val) !GCC$ attributes always_inline :: set_left_int
         class(either), intent(inout) :: this
         integer, intent(in) :: val
-        ! Inlined clear_left (optimized: no active_l assignment)
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
-        ! Inlined clear_right
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
+        
         this%active_r = TYPE_NONE
         
         this%l_bytes = transfer(val, this%l_bytes)
@@ -331,11 +331,11 @@ contains
     pure elemental subroutine set_right_int(this, val) !GCC$ attributes always_inline :: set_right_int
         class(either), intent(inout) :: this
         integer, intent(in) :: val
-        ! Inlined clear_left
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
         this%active_l = TYPE_NONE
-        ! Inlined clear_right (optimized: no active_r assignment)
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
         
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_INT
@@ -375,10 +375,10 @@ contains
     pure elemental subroutine set_left_i8(this, val) !GCC$ attributes always_inline :: set_left_i8
         class(either), intent(inout) :: this
         integer(int8), intent(in) :: val
-        ! Inlined clear_left (optimized: no active_l assignment)
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
-        ! Inlined clear_right
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
+        
         this%active_r = TYPE_NONE
         
         this%l_bytes = transfer(val, this%l_bytes)
@@ -387,11 +387,11 @@ contains
     pure elemental subroutine set_right_i8(this, val) !GCC$ attributes always_inline :: set_right_i8
         class(either), intent(inout) :: this
         integer(int8), intent(in) :: val
-        ! Inlined clear_left
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
         this%active_l = TYPE_NONE
-        ! Inlined clear_right (optimized: no active_r assignment)
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
         
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_I8
@@ -431,10 +431,10 @@ contains
     pure elemental subroutine set_left_i16(this, val) !GCC$ attributes always_inline :: set_left_i16
         class(either), intent(inout) :: this
         integer(int16), intent(in) :: val
-        ! Inlined clear_left (optimized: no active_l assignment)
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
-        ! Inlined clear_right
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
+        
         this%active_r = TYPE_NONE
         
         this%l_bytes = transfer(val, this%l_bytes)
@@ -443,11 +443,11 @@ contains
     pure elemental subroutine set_right_i16(this, val) !GCC$ attributes always_inline :: set_right_i16
         class(either), intent(inout) :: this
         integer(int16), intent(in) :: val
-        ! Inlined clear_left
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
         this%active_l = TYPE_NONE
-        ! Inlined clear_right (optimized: no active_r assignment)
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
         
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_I16
@@ -487,10 +487,10 @@ contains
     pure elemental subroutine set_left_i64(this, val) !GCC$ attributes always_inline :: set_left_i64
         class(either), intent(inout) :: this
         integer(int64), intent(in) :: val
-        ! Inlined clear_left (optimized: no active_l assignment)
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
-        ! Inlined clear_right
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
+        
         this%active_r = TYPE_NONE
         
         this%l_bytes = transfer(val, this%l_bytes)
@@ -499,11 +499,11 @@ contains
     pure elemental subroutine set_right_i64(this, val) !GCC$ attributes always_inline :: set_right_i64
         class(either), intent(inout) :: this
         integer(int64), intent(in) :: val
-        ! Inlined clear_left
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
         this%active_l = TYPE_NONE
-        ! Inlined clear_right (optimized: no active_r assignment)
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
         
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_I64
@@ -543,10 +543,10 @@ contains
     pure elemental subroutine set_left_real(this, val) !GCC$ attributes always_inline :: set_left_real
         class(either), intent(inout) :: this
         real, intent(in) :: val
-        ! Inlined clear_left (optimized: no active_l assignment)
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
-        ! Inlined clear_right
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
+        
         this%active_r = TYPE_NONE
         
         this%l_bytes = transfer(val, this%l_bytes)
@@ -555,11 +555,11 @@ contains
     pure elemental subroutine set_right_real(this, val) !GCC$ attributes always_inline :: set_right_real
         class(either), intent(inout) :: this
         real, intent(in) :: val
-        ! Inlined clear_left
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
         this%active_l = TYPE_NONE
-        ! Inlined clear_right (optimized: no active_r assignment)
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
         
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_REAL
@@ -599,10 +599,10 @@ contains
     pure elemental subroutine set_left_r64(this, val) !GCC$ attributes always_inline :: set_left_r64
         class(either), intent(inout) :: this
         real(real64), intent(in) :: val
-        ! Inlined clear_left (optimized: no active_l assignment)
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
-        ! Inlined clear_right
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
+        
         this%active_r = TYPE_NONE
         
         this%l_bytes = transfer(val, this%l_bytes)
@@ -611,11 +611,11 @@ contains
     pure elemental subroutine set_right_r64(this, val) !GCC$ attributes always_inline :: set_right_r64
         class(either), intent(inout) :: this
         real(real64), intent(in) :: val
-        ! Inlined clear_left
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
         this%active_l = TYPE_NONE
-        ! Inlined clear_right (optimized: no active_r assignment)
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
         
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_R64
@@ -655,10 +655,10 @@ contains
     pure elemental subroutine set_left_log(this, val) !GCC$ attributes always_inline :: set_left_log
         class(either), intent(inout) :: this
         logical, intent(in) :: val
-        ! Inlined clear_left (optimized: no active_l assignment)
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
-        ! Inlined clear_right
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
+        
         this%active_r = TYPE_NONE
         
         this%l_bytes = transfer(val, this%l_bytes)
@@ -667,11 +667,11 @@ contains
     pure elemental subroutine set_right_log(this, val) !GCC$ attributes always_inline :: set_right_log
         class(either), intent(inout) :: this
         logical, intent(in) :: val
-        ! Inlined clear_left
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
         this%active_l = TYPE_NONE
-        ! Inlined clear_right (optimized: no active_r assignment)
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
         
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_LOG
@@ -711,10 +711,10 @@ contains
     pure elemental subroutine set_left_cpx(this, val) !GCC$ attributes always_inline :: set_left_cpx
         class(either), intent(inout) :: this
         complex, intent(in) :: val
-        ! Inlined clear_left (optimized: no active_l assignment)
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
-        ! Inlined clear_right
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
+        
         this%active_r = TYPE_NONE
         
         this%l_bytes = transfer(val, this%l_bytes)
@@ -723,11 +723,11 @@ contains
     pure elemental subroutine set_right_cpx(this, val) !GCC$ attributes always_inline :: set_right_cpx
         class(either), intent(inout) :: this
         complex, intent(in) :: val
-        ! Inlined clear_left
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
         this%active_l = TYPE_NONE
-        ! Inlined clear_right (optimized: no active_r assignment)
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
         
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_CPX
@@ -767,10 +767,10 @@ contains
     pure elemental subroutine set_left_c64(this, val) !GCC$ attributes always_inline :: set_left_c64
         class(either), intent(inout) :: this
         complex(real64), intent(in) :: val
-        ! Inlined clear_left (optimized: no active_l assignment)
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
-        ! Inlined clear_right
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
+        
         this%active_r = TYPE_NONE
         
         this%l_bytes = transfer(val, this%l_bytes)
@@ -779,11 +779,11 @@ contains
     pure elemental subroutine set_right_c64(this, val) !GCC$ attributes always_inline :: set_right_c64
         class(either), intent(inout) :: this
         complex(real64), intent(in) :: val
-        ! Inlined clear_left
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
+        
+        if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
         this%active_l = TYPE_NONE
-        ! Inlined clear_right (optimized: no active_r assignment)
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        
+        if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
         
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_C64
