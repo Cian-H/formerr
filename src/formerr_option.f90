@@ -41,13 +41,13 @@ module formerr_option
 
 contains
 
-    function some(val) result(res)
+    pure function some(val) result(res)
         class(*), intent(in) :: val
         type(option) :: res
         call res%set_right(val)
     end function some
 
-    function none() result(res)
+    pure function none() result(res)
         type(option) :: res
         type(unit_type) :: u
         call res%set_left(u)
@@ -59,12 +59,12 @@ contains
         call res%move_right(val)
     end function some_move
 
-    logical function is_some(this)
+    pure elemental logical function is_some(this)
         class(option), intent(in) :: this
         is_some = this%is_right()
     end function is_some
 
-    logical function is_none(this)
+    pure elemental logical function is_none(this)
         class(option), intent(in) :: this
         is_none = this%is_left()
     end function is_none
@@ -115,13 +115,13 @@ contains
 
     ! -- Specialized Implementations --
 
-    function some_int(val) result(res)
+    pure elemental function some_int(val) result(res)
         integer, intent(in) :: val
         type(option) :: res
         call res%set_right_int(val)
     end function some_int
 
-    function unwrap_int(this) result(val)
+    pure elemental function unwrap_int(this) result(val)
         class(option), intent(in) :: this
         integer :: val
         if (this%is_none()) error stop "unwrap_int called on None value"
@@ -129,13 +129,13 @@ contains
         val = this%get_right_int()
     end function unwrap_int
 
-    function some_i8(val) result(res)
+    pure elemental function some_i8(val) result(res)
         integer(int8), intent(in) :: val
         type(option) :: res
         call res%set_right_i8(val)
     end function some_i8
 
-    function unwrap_i8(this) result(val)
+    pure elemental function unwrap_i8(this) result(val)
         class(option), intent(in) :: this
         integer(int8) :: val
         if (this%is_none()) error stop "unwrap_i8 called on None value"
@@ -143,13 +143,13 @@ contains
         val = this%get_right_i8()
     end function unwrap_i8
 
-    function some_i16(val) result(res)
+    pure elemental function some_i16(val) result(res)
         integer(int16), intent(in) :: val
         type(option) :: res
         call res%set_right_i16(val)
     end function some_i16
 
-    function unwrap_i16(this) result(val)
+    pure elemental function unwrap_i16(this) result(val)
         class(option), intent(in) :: this
         integer(int16) :: val
         if (this%is_none()) error stop "unwrap_i16 called on None value"
@@ -157,13 +157,13 @@ contains
         val = this%get_right_i16()
     end function unwrap_i16
 
-    function some_i64(val) result(res)
+    pure elemental function some_i64(val) result(res)
         integer(int64), intent(in) :: val
         type(option) :: res
         call res%set_right_i64(val)
     end function some_i64
 
-    function unwrap_i64(this) result(val)
+    pure elemental function unwrap_i64(this) result(val)
         class(option), intent(in) :: this
         integer(int64) :: val
         if (this%is_none()) error stop "unwrap_i64 called on None value"
@@ -171,13 +171,13 @@ contains
         val = this%get_right_i64()
     end function unwrap_i64
 
-    function some_real(val) result(res)
+    pure elemental function some_real(val) result(res)
         real, intent(in) :: val
         type(option) :: res
         call res%set_right_real(val)
     end function some_real
 
-    function unwrap_real(this) result(val)
+    pure elemental function unwrap_real(this) result(val)
         class(option), intent(in) :: this
         real :: val
         if (this%is_none()) error stop "unwrap_real called on None value"
@@ -185,13 +185,13 @@ contains
         val = this%get_right_real()
     end function unwrap_real
 
-    function some_r64(val) result(res)
+    pure elemental function some_r64(val) result(res)
         real(real64), intent(in) :: val
         type(option) :: res
         call res%set_right_r64(val)
     end function some_r64
 
-    function unwrap_r64(this) result(val)
+    pure elemental function unwrap_r64(this) result(val)
         class(option), intent(in) :: this
         real(real64) :: val
         if (this%is_none()) error stop "unwrap_r64 called on None value"
@@ -199,13 +199,13 @@ contains
         val = this%get_right_r64()
     end function unwrap_r64
 
-    function some_log(val) result(res)
+    pure elemental function some_log(val) result(res)
         logical, intent(in) :: val
         type(option) :: res
         call res%set_right_log(val)
     end function some_log
 
-    function unwrap_log(this) result(val)
+    pure elemental function unwrap_log(this) result(val)
         class(option), intent(in) :: this
         logical :: val
         if (this%is_none()) error stop "unwrap_log called on None value"
@@ -213,13 +213,13 @@ contains
         val = this%get_right_log()
     end function unwrap_log
 
-    function some_cpx(val) result(res)
+    pure elemental function some_cpx(val) result(res)
         complex, intent(in) :: val
         type(option) :: res
         call res%set_right_cpx(val)
     end function some_cpx
 
-    function unwrap_cpx(this) result(val)
+    pure elemental function unwrap_cpx(this) result(val)
         class(option), intent(in) :: this
         complex :: val
         if (this%is_none()) error stop "unwrap_cpx called on None value"
@@ -227,13 +227,13 @@ contains
         val = this%get_right_cpx()
     end function unwrap_cpx
 
-    function some_c64(val) result(res)
+    pure elemental function some_c64(val) result(res)
         complex(real64), intent(in) :: val
         type(option) :: res
         call res%set_right_c64(val)
     end function some_c64
 
-    function unwrap_c64(this) result(val)
+    pure elemental function unwrap_c64(this) result(val)
         class(option), intent(in) :: this
         complex(real64) :: val
         if (this%is_none()) error stop "unwrap_c64 called on None value"

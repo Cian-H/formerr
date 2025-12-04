@@ -59,7 +59,7 @@ def generate_either():
 
         # GET LEFT
         specialized_impls += f"""
-    function get_left_{t_suffix}(this) result(val)
+    pure elemental function get_left_{t_suffix}(this) result(val)
         class(either), intent(in) :: this
         {t_type} :: val
         if (this%active_l == {const_name}) then
@@ -78,7 +78,7 @@ def generate_either():
 
         # GET RIGHT
         specialized_impls += f"""
-    function get_right_{t_suffix}(this) result(val)
+    pure elemental function get_right_{t_suffix}(this) result(val)
         class(either), intent(in) :: this
         {t_type} :: val
         if (this%active_r == {const_name}) then
@@ -97,7 +97,7 @@ def generate_either():
 
         # SET LEFT
         specialized_impls += f"""
-    subroutine set_left_{t_suffix}(this, val)
+    pure elemental subroutine set_left_{t_suffix}(this, val)
         class(either), intent(inout) :: this
         {t_type}, intent(in) :: val
         call this%clear_left()
@@ -108,7 +108,7 @@ def generate_either():
 
         # SET RIGHT
         specialized_impls += f"""
-    subroutine set_right_{t_suffix}(this, val)
+    pure elemental subroutine set_right_{t_suffix}(this, val)
         class(either), intent(inout) :: this
         {t_type}, intent(in) :: val
         call this%clear_left()

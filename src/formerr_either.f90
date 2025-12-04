@@ -109,36 +109,36 @@ contains
         end if
     end function new_either
 
-    function new_left(val) result(res)
+    pure function new_left(val) result(res)
         class(*), intent(in) :: val
         type(either) :: res
         call res%set_left(val)
     end function new_left
 
-    function new_right(val) result(res)
+    pure function new_right(val) result(res)
         class(*), intent(in) :: val
         type(either) :: res
         call res%set_right(val)
     end function new_right
 
-    logical function is_left(this)
+    pure elemental logical function is_left(this)
         class(either), intent(in) :: this
         is_left = (this%active_l /= TYPE_NONE)
     end function is_left
 
-    logical function is_right(this)
+    pure elemental logical function is_right(this)
         class(either), intent(in) :: this
         is_right = (this%active_r /= TYPE_NONE)
     end function is_right
 
-    subroutine clear_left(this)
+    pure subroutine clear_left(this)
         class(either), intent(inout) :: this
         if (allocated(this%l_val_dyn)) deallocate (this%l_val_dyn)
         ! Monomorphised fields are embedded, no deallocation needed
         this%active_l = TYPE_NONE
     end subroutine clear_left
 
-    subroutine clear_right(this)
+    pure subroutine clear_right(this)
         class(either), intent(inout) :: this
         if (allocated(this%r_val_dyn)) deallocate (this%r_val_dyn)
         ! Monomorphised fields are embedded, no deallocation needed
@@ -205,7 +205,7 @@ contains
         end select
     end function get_right
 
-    subroutine set_left(this, val)
+    pure subroutine set_left(this, val)
         class(either), intent(inout) :: this
         class(*), intent(in) :: val
 
@@ -221,7 +221,7 @@ contains
         end select
     end subroutine set_left
 
-    subroutine set_right(this, val)
+    pure subroutine set_right(this, val)
         class(either), intent(inout) :: this
         class(*), intent(in) :: val
 
@@ -236,7 +236,7 @@ contains
         end select
     end subroutine set_right
 
-    subroutine move_left(this, val)
+    pure subroutine move_left(this, val)
         class(either), intent(inout) :: this
         class(*), allocatable, intent(inout) :: val
 
@@ -258,7 +258,7 @@ contains
 
     end subroutine move_left
 
-    subroutine move_right(this, val)
+    pure subroutine move_right(this, val)
         class(either), intent(inout) :: this
         class(*), allocatable, intent(inout) :: val
 
@@ -279,7 +279,7 @@ contains
 
     ! -- Specialized Implementations --
 
-    function get_left_int(this) result(val)
+    pure elemental function get_left_int(this) result(val)
         class(either), intent(in) :: this
         integer :: val
         if (this%active_l == TYPE_INT) then
@@ -295,7 +295,7 @@ contains
             error stop "get_left_int called on wrong type"
         end if
     end function get_left_int
-    function get_right_int(this) result(val)
+    pure elemental function get_right_int(this) result(val)
         class(either), intent(in) :: this
         integer :: val
         if (this%active_r == TYPE_INT) then
@@ -311,7 +311,7 @@ contains
             error stop "get_right_int called on wrong type"
         end if
     end function get_right_int
-    subroutine set_left_int(this, val)
+    pure elemental subroutine set_left_int(this, val)
         class(either), intent(inout) :: this
         integer, intent(in) :: val
         call this%clear_left()
@@ -319,7 +319,7 @@ contains
         this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = TYPE_INT
     end subroutine set_left_int
-    subroutine set_right_int(this, val)
+    pure elemental subroutine set_right_int(this, val)
         class(either), intent(inout) :: this
         integer, intent(in) :: val
         call this%clear_left()
@@ -327,7 +327,7 @@ contains
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_INT
     end subroutine set_right_int
-    function get_left_i8(this) result(val)
+    pure elemental function get_left_i8(this) result(val)
         class(either), intent(in) :: this
         integer(int8) :: val
         if (this%active_l == TYPE_I8) then
@@ -343,7 +343,7 @@ contains
             error stop "get_left_i8 called on wrong type"
         end if
     end function get_left_i8
-    function get_right_i8(this) result(val)
+    pure elemental function get_right_i8(this) result(val)
         class(either), intent(in) :: this
         integer(int8) :: val
         if (this%active_r == TYPE_I8) then
@@ -359,7 +359,7 @@ contains
             error stop "get_right_i8 called on wrong type"
         end if
     end function get_right_i8
-    subroutine set_left_i8(this, val)
+    pure elemental subroutine set_left_i8(this, val)
         class(either), intent(inout) :: this
         integer(int8), intent(in) :: val
         call this%clear_left()
@@ -367,7 +367,7 @@ contains
         this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = TYPE_I8
     end subroutine set_left_i8
-    subroutine set_right_i8(this, val)
+    pure elemental subroutine set_right_i8(this, val)
         class(either), intent(inout) :: this
         integer(int8), intent(in) :: val
         call this%clear_left()
@@ -375,7 +375,7 @@ contains
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_I8
     end subroutine set_right_i8
-    function get_left_i16(this) result(val)
+    pure elemental function get_left_i16(this) result(val)
         class(either), intent(in) :: this
         integer(int16) :: val
         if (this%active_l == TYPE_I16) then
@@ -391,7 +391,7 @@ contains
             error stop "get_left_i16 called on wrong type"
         end if
     end function get_left_i16
-    function get_right_i16(this) result(val)
+    pure elemental function get_right_i16(this) result(val)
         class(either), intent(in) :: this
         integer(int16) :: val
         if (this%active_r == TYPE_I16) then
@@ -407,7 +407,7 @@ contains
             error stop "get_right_i16 called on wrong type"
         end if
     end function get_right_i16
-    subroutine set_left_i16(this, val)
+    pure elemental subroutine set_left_i16(this, val)
         class(either), intent(inout) :: this
         integer(int16), intent(in) :: val
         call this%clear_left()
@@ -415,7 +415,7 @@ contains
         this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = TYPE_I16
     end subroutine set_left_i16
-    subroutine set_right_i16(this, val)
+    pure elemental subroutine set_right_i16(this, val)
         class(either), intent(inout) :: this
         integer(int16), intent(in) :: val
         call this%clear_left()
@@ -423,7 +423,7 @@ contains
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_I16
     end subroutine set_right_i16
-    function get_left_i64(this) result(val)
+    pure elemental function get_left_i64(this) result(val)
         class(either), intent(in) :: this
         integer(int64) :: val
         if (this%active_l == TYPE_I64) then
@@ -439,7 +439,7 @@ contains
             error stop "get_left_i64 called on wrong type"
         end if
     end function get_left_i64
-    function get_right_i64(this) result(val)
+    pure elemental function get_right_i64(this) result(val)
         class(either), intent(in) :: this
         integer(int64) :: val
         if (this%active_r == TYPE_I64) then
@@ -455,7 +455,7 @@ contains
             error stop "get_right_i64 called on wrong type"
         end if
     end function get_right_i64
-    subroutine set_left_i64(this, val)
+    pure elemental subroutine set_left_i64(this, val)
         class(either), intent(inout) :: this
         integer(int64), intent(in) :: val
         call this%clear_left()
@@ -463,7 +463,7 @@ contains
         this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = TYPE_I64
     end subroutine set_left_i64
-    subroutine set_right_i64(this, val)
+    pure elemental subroutine set_right_i64(this, val)
         class(either), intent(inout) :: this
         integer(int64), intent(in) :: val
         call this%clear_left()
@@ -471,7 +471,7 @@ contains
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_I64
     end subroutine set_right_i64
-    function get_left_real(this) result(val)
+    pure elemental function get_left_real(this) result(val)
         class(either), intent(in) :: this
         real :: val
         if (this%active_l == TYPE_REAL) then
@@ -487,7 +487,7 @@ contains
             error stop "get_left_real called on wrong type"
         end if
     end function get_left_real
-    function get_right_real(this) result(val)
+    pure elemental function get_right_real(this) result(val)
         class(either), intent(in) :: this
         real :: val
         if (this%active_r == TYPE_REAL) then
@@ -503,7 +503,7 @@ contains
             error stop "get_right_real called on wrong type"
         end if
     end function get_right_real
-    subroutine set_left_real(this, val)
+    pure elemental subroutine set_left_real(this, val)
         class(either), intent(inout) :: this
         real, intent(in) :: val
         call this%clear_left()
@@ -511,7 +511,7 @@ contains
         this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = TYPE_REAL
     end subroutine set_left_real
-    subroutine set_right_real(this, val)
+    pure elemental subroutine set_right_real(this, val)
         class(either), intent(inout) :: this
         real, intent(in) :: val
         call this%clear_left()
@@ -519,7 +519,7 @@ contains
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_REAL
     end subroutine set_right_real
-    function get_left_r64(this) result(val)
+    pure elemental function get_left_r64(this) result(val)
         class(either), intent(in) :: this
         real(real64) :: val
         if (this%active_l == TYPE_R64) then
@@ -535,7 +535,7 @@ contains
             error stop "get_left_r64 called on wrong type"
         end if
     end function get_left_r64
-    function get_right_r64(this) result(val)
+    pure elemental function get_right_r64(this) result(val)
         class(either), intent(in) :: this
         real(real64) :: val
         if (this%active_r == TYPE_R64) then
@@ -551,7 +551,7 @@ contains
             error stop "get_right_r64 called on wrong type"
         end if
     end function get_right_r64
-    subroutine set_left_r64(this, val)
+    pure elemental subroutine set_left_r64(this, val)
         class(either), intent(inout) :: this
         real(real64), intent(in) :: val
         call this%clear_left()
@@ -559,7 +559,7 @@ contains
         this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = TYPE_R64
     end subroutine set_left_r64
-    subroutine set_right_r64(this, val)
+    pure elemental subroutine set_right_r64(this, val)
         class(either), intent(inout) :: this
         real(real64), intent(in) :: val
         call this%clear_left()
@@ -567,7 +567,7 @@ contains
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_R64
     end subroutine set_right_r64
-    function get_left_log(this) result(val)
+    pure elemental function get_left_log(this) result(val)
         class(either), intent(in) :: this
         logical :: val
         if (this%active_l == TYPE_LOG) then
@@ -583,7 +583,7 @@ contains
             error stop "get_left_log called on wrong type"
         end if
     end function get_left_log
-    function get_right_log(this) result(val)
+    pure elemental function get_right_log(this) result(val)
         class(either), intent(in) :: this
         logical :: val
         if (this%active_r == TYPE_LOG) then
@@ -599,7 +599,7 @@ contains
             error stop "get_right_log called on wrong type"
         end if
     end function get_right_log
-    subroutine set_left_log(this, val)
+    pure elemental subroutine set_left_log(this, val)
         class(either), intent(inout) :: this
         logical, intent(in) :: val
         call this%clear_left()
@@ -607,7 +607,7 @@ contains
         this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = TYPE_LOG
     end subroutine set_left_log
-    subroutine set_right_log(this, val)
+    pure elemental subroutine set_right_log(this, val)
         class(either), intent(inout) :: this
         logical, intent(in) :: val
         call this%clear_left()
@@ -615,7 +615,7 @@ contains
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_LOG
     end subroutine set_right_log
-    function get_left_cpx(this) result(val)
+    pure elemental function get_left_cpx(this) result(val)
         class(either), intent(in) :: this
         complex :: val
         if (this%active_l == TYPE_CPX) then
@@ -631,7 +631,7 @@ contains
             error stop "get_left_cpx called on wrong type"
         end if
     end function get_left_cpx
-    function get_right_cpx(this) result(val)
+    pure elemental function get_right_cpx(this) result(val)
         class(either), intent(in) :: this
         complex :: val
         if (this%active_r == TYPE_CPX) then
@@ -647,7 +647,7 @@ contains
             error stop "get_right_cpx called on wrong type"
         end if
     end function get_right_cpx
-    subroutine set_left_cpx(this, val)
+    pure elemental subroutine set_left_cpx(this, val)
         class(either), intent(inout) :: this
         complex, intent(in) :: val
         call this%clear_left()
@@ -655,7 +655,7 @@ contains
         this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = TYPE_CPX
     end subroutine set_left_cpx
-    subroutine set_right_cpx(this, val)
+    pure elemental subroutine set_right_cpx(this, val)
         class(either), intent(inout) :: this
         complex, intent(in) :: val
         call this%clear_left()
@@ -663,7 +663,7 @@ contains
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = TYPE_CPX
     end subroutine set_right_cpx
-    function get_left_c64(this) result(val)
+    pure elemental function get_left_c64(this) result(val)
         class(either), intent(in) :: this
         complex(real64) :: val
         if (this%active_l == TYPE_C64) then
@@ -679,7 +679,7 @@ contains
             error stop "get_left_c64 called on wrong type"
         end if
     end function get_left_c64
-    function get_right_c64(this) result(val)
+    pure elemental function get_right_c64(this) result(val)
         class(either), intent(in) :: this
         complex(real64) :: val
         if (this%active_r == TYPE_C64) then
@@ -695,7 +695,7 @@ contains
             error stop "get_right_c64 called on wrong type"
         end if
     end function get_right_c64
-    subroutine set_left_c64(this, val)
+    pure elemental subroutine set_left_c64(this, val)
         class(either), intent(inout) :: this
         complex(real64), intent(in) :: val
         call this%clear_left()
@@ -703,7 +703,7 @@ contains
         this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = TYPE_C64
     end subroutine set_left_c64
-    subroutine set_right_c64(this, val)
+    pure elemental subroutine set_right_c64(this, val)
         class(either), intent(inout) :: this
         complex(real64), intent(in) :: val
         call this%clear_left()

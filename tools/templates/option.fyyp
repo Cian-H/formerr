@@ -24,13 +24,13 @@ module formerr_option
 
 contains
 
-    function some(val) result(res)
+    pure function some(val) result(res)
         class(*), intent(in) :: val
         type(option) :: res
         call res%set_right(val)
     end function some
 
-    function none() result(res)
+    pure function none() result(res)
         type(option) :: res
         type(unit_type) :: u
         call res%set_left(u)
@@ -42,12 +42,12 @@ contains
         call res%move_right(val)
     end function some_move
 
-    logical function is_some(this)
+    pure elemental logical function is_some(this)
         class(option), intent(in) :: this
         is_some = this%is_right()
     end function is_some
 
-    logical function is_none(this)
+    pure elemental logical function is_none(this)
         class(option), intent(in) :: this
         is_none = this%is_left()
     end function is_none

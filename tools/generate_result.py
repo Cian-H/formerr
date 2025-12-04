@@ -27,7 +27,7 @@ def generate_result():
 
         # ok_{suffix}
         specialized_impls += f"""
-    function ok_{t_suffix}(val) result(res)
+    pure elemental function ok_{t_suffix}(val) result(res)
         {t_type}, intent(in) :: val
         type(result_type) :: res
         call res%set_right_{t_suffix}(val)
@@ -35,7 +35,7 @@ def generate_result():
 """
         # err_{suffix}
         specialized_impls += f"""
-    function err_{t_suffix}(val) result(res)
+    pure elemental function err_{t_suffix}(val) result(res)
         {t_type}, intent(in) :: val
         type(result_type) :: res
         call res%set_left_{t_suffix}(val)
@@ -44,7 +44,7 @@ def generate_result():
 
         # unwrap_{suffix} (for Ok)
         specialized_impls += f"""
-    function unwrap_{t_suffix}(this) result(val)
+    pure elemental function unwrap_{t_suffix}(this) result(val)
         class(result_type), intent(in) :: this
         {t_type} :: val
         if (this%is_err()) error stop \"unwrap_{t_suffix} called on Err value\"
@@ -54,7 +54,7 @@ def generate_result():
 
         # unwrap_err_{suffix} (for Err)
         specialized_impls += f"""
-    function unwrap_err_{t_suffix}(this) result(val)
+    pure elemental function unwrap_err_{t_suffix}(this) result(val)
         class(result_type), intent(in) :: this
         {t_type} :: val
         if (this%is_ok()) error stop \"unwrap_err_{t_suffix} called on Ok value\"

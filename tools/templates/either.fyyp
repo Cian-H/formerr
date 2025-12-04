@@ -63,36 +63,36 @@ contains
         end if
     end function new_either
 
-    function new_left(val) result(res)
+    pure function new_left(val) result(res)
         class(*), intent(in) :: val
         type(either) :: res
         call res%set_left(val)
     end function new_left
 
-    function new_right(val) result(res)
+    pure function new_right(val) result(res)
         class(*), intent(in) :: val
         type(either) :: res
         call res%set_right(val)
     end function new_right
 
-    logical function is_left(this)
+    pure elemental logical function is_left(this)
         class(either), intent(in) :: this
         is_left = (this%active_l /= TYPE_NONE)
     end function is_left
 
-    logical function is_right(this)
+    pure elemental logical function is_right(this)
         class(either), intent(in) :: this
         is_right = (this%active_r /= TYPE_NONE)
     end function is_right
 
-    subroutine clear_left(this)
+    pure subroutine clear_left(this)
         class(either), intent(inout) :: this
         if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
         ! Monomorphised fields are embedded, no deallocation needed
         this%active_l = TYPE_NONE
     end subroutine clear_left
 
-    subroutine clear_right(this)
+    pure subroutine clear_right(this)
         class(either), intent(inout) :: this
         if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
         ! Monomorphised fields are embedded, no deallocation needed
@@ -123,7 +123,7 @@ contains
         end select
     end function get_right
 
-    subroutine set_left(this, val)
+    pure subroutine set_left(this, val)
         class(either), intent(inout) :: this
         class(*), intent(in) :: val
 
@@ -139,7 +139,7 @@ contains
         end select
     end subroutine set_left
 
-    subroutine set_right(this, val)
+    pure subroutine set_right(this, val)
         class(either), intent(inout) :: this
         class(*), intent(in) :: val
 
@@ -154,7 +154,7 @@ contains
         end select
     end subroutine set_right
 
-    subroutine move_left(this, val)
+    pure subroutine move_left(this, val)
         class(either), intent(inout) :: this
         class(*), allocatable, intent(inout) :: val
 
@@ -176,7 +176,7 @@ contains
 
     end subroutine move_left
 
-    subroutine move_right(this, val)
+    pure subroutine move_right(this, val)
         class(either), intent(inout) :: this
         class(*), allocatable, intent(inout) :: val
 

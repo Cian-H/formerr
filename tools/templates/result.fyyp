@@ -23,13 +23,13 @@ module formerr_result
 
 contains
 
-    function ok(val) result(res)
+    pure function ok(val) result(res)
         class(*), intent(in) :: val
         type(result_type) :: res
         call res%set_right(val)
     end function ok
 
-    function err(val) result(res)
+    pure function err(val) result(res)
         class(*), intent(in) :: val
         type(result_type) :: res
         call res%set_left(val)
@@ -47,12 +47,12 @@ contains
         call res%move_left(val)
     end function err_move
 
-    logical function is_ok(this)
+    pure elemental logical function is_ok(this)
         class(result_type), intent(in) :: this
         is_ok = this%is_right()
     end function is_ok
 
-    logical function is_err(this)
+    pure elemental logical function is_err(this)
         class(result_type), intent(in) :: this
         is_err = this%is_left()
     end function is_err
