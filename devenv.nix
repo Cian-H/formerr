@@ -16,6 +16,15 @@
 
   languages.fortran.enable = true;
 
+  treefmt = {
+    enable = true;
+    config.programs = {
+      alejandra.enable = true;
+      fprettify.enable = true;
+      ruff-format.enable = true;
+    };
+  };
+
   git-hooks.hooks = {
     alejandra.enable = true;
     check-toml.enable = true;
@@ -26,7 +35,7 @@
   };
 
   scripts = {
-    codegen.exec = "python $DEVENV_ROOT/tools/generate.py";
+    codegen.exec = "python $DEVENV_ROOT/tools/generate.py && treefmt";
     build-dev.exec = "codegen && fortran-fpm build";
     build.exec = "codegen && fortran-fpm build --profile release";
     bench.exec = "codegen && build && fortran-fpm test bench --profile release";
