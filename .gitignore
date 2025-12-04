@@ -53,3 +53,5 @@ devenv.local.yaml
 
 bench.csv
 __pycache__
+.gemini
+GEMINI.md
