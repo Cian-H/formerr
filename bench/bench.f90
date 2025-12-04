@@ -55,9 +55,11 @@ contains
     subroutine bench_native_success(n)
         integer, intent(in) :: n
         integer :: i, stat, val
+        integer, volatile :: sink
         do i = 1, n
             call native_add(i, 1, val, stat)
             if (stat /= 0) error stop "Fail"
+            sink = val
         end do
     end subroutine
 
@@ -74,6 +76,7 @@ contains
         integer :: i
         type(result_type) :: res
         class(*), pointer :: val
+        integer, volatile :: sink
 
         do i = 1, n
             res = formerr_add(i, 1)
@@ -84,6 +87,7 @@ contains
             select type (val)
             type is (integer)
                 if (val < 0) stop
+                sink = val
             end select
         end do
     end subroutine
@@ -93,6 +97,7 @@ contains
         integer, intent(in) :: n
         integer :: i, val
         type(result_type) :: res
+        integer, volatile :: sink
 
         do i = 1, n
             ! Generic construction
@@ -102,6 +107,7 @@ contains
             ! Specialized unwrap
             val = res%unwrap_int()
             if (val < 0) stop
+            sink = val
         end do
     end subroutine
 
@@ -110,6 +116,7 @@ contains
         integer, intent(in) :: n
         integer :: i, val
         type(result_type) :: res
+        integer, volatile :: sink
 
         do i = 1, n
             ! Specialized construction
@@ -119,6 +126,7 @@ contains
             ! Specialized unwrap
             val = res%unwrap_int()
             if (val < 0) stop
+            sink = val
         end do
     end subroutine
 
