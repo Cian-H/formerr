@@ -1,12 +1,12 @@
 program benchmark
     use, intrinsic :: iso_fortran_env, only: int64, real64
-    use formerr_result, only: result_type, ok, err, ok_int
+    use formerr_result, only: result_type, ok, err, ok_int, ok_string
     use formerr_option, only: option, some, none
     implicit none
 
     integer, parameter :: ITERATIONS = 10000000
     integer(int64) :: t_start, t_end, t_rate
-    real(real64) :: t_native, t_formerr
+    real(real64) :: t_native, t_formerr, t_sso, t_dyn
 
     print *, "Running benchmarks with", ITERATIONS, "iterations..."
     call system_clock(count_rate=t_rate)
@@ -48,6 +48,26 @@ program benchmark
     print '(A, F10.9, A)', "Formerr (Fully Spec):    ", t_formerr, " s"
 
     print '(A, F12.2, A)', "Overhead (Fully Spec):   ", t_formerr/t_native, "x"
+
+    ! --- SCENARIO 2: String Handling (SSO vs Dynamic) ---
+    print *, "------------------------------------------------"
+    print *, "SCENARIO: String Handling (SSO vs Dynamic)"
+
+    ! 1. SSO Path (< 32 chars)
+    call system_clock(t_start)
+    call bench_sso_string(ITERATIONS)
+    call system_clock(t_end)
+    t_sso = real(t_end - t_start, real64)/real(t_rate, real64)
+    print '(A, F10.9, A)', "SSO String (<32 chars):  ", t_sso, " s"
+
+    ! 2. Dynamic Path (>= 32 chars)
+    call system_clock(t_start)
+    call bench_dyn_string(ITERATIONS)
+    call system_clock(t_end)
+    t_dyn = real(t_end - t_start, real64)/real(t_rate, real64)
+    print '(A, F10.9, A)', "Dynamic String (>=32):   ", t_dyn, " s"
+
+    print '(A, F12.2, A)', "Speedup (SSO vs Dyn):    ", t_dyn/t_sso, "x"
 
 contains
 
@@ -141,5 +161,36 @@ contains
         type(result_type) :: res
         res = ok_int(a + b)
     end function
+
+    ! --- String Benchmarks ---
+    subroutine bench_sso_string(n)
+        integer, intent(in) :: n
+        integer :: i
+        type(result_type) :: res
+        character(:), allocatable :: val
+        ! Short string (fits in 32 bytes)
+        character(len=*), parameter :: s = "Short string"
+
+        do i = 1, n
+            res = ok_string(s)
+            val = res%unwrap_string()
+            if (len(val) /= len(s)) stop "Length mismatch"
+        end do
+    end subroutine
+
+    subroutine bench_dyn_string(n)
+        integer, intent(in) :: n
+        integer :: i
+        type(result_type) :: res
+        character(:), allocatable :: val
+        ! Long string (> 32 bytes)
+        character(len=*), parameter :: s = "This string is definitely longer than thirty-two bytes so it allocates"
+
+        do i = 1, n
+            res = ok_string(s)
+            val = res%unwrap_string()
+            if (len(val) /= len(s)) stop "Length mismatch"
+        end do
+    end subroutine
 
 end program benchmark
