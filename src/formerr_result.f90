@@ -1,10 +1,12 @@
 module formerr_result
     use formerr_either
     use stdlib_error, only: check
-    use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, real64, real128
+    use, intrinsic :: iso_fortran_env, only: real32, real64, real128, int8, int16, int32, int64
     implicit none
     private
 
+    integer, parameter :: real8 = selected_real_kind(2, 2)
+    integer, parameter :: real16 = selected_real_kind(4, 4)
     integer, parameter :: int128 = selected_int_kind(38)
 
     logical, parameter :: DO_CHECKS = .false.
@@ -24,6 +26,12 @@ module formerr_result
 
     public :: ok_r16, err_r16
 
+    public :: ok_r32, err_r32
+
+    public :: ok_r64, err_r64
+
+    public :: ok_r128, err_r128
+
     public :: ok_i8, err_i8
 
     public :: ok_i16, err_i16
@@ -34,11 +42,11 @@ module formerr_result
 
     public :: ok_i128, err_i128
 
-    public :: ok_r32, err_r32
+    public :: ok_c8, err_c8
 
-    public :: ok_r64, err_r64
+    public :: ok_c16, err_c16
 
-    public :: ok_r128, err_r128
+    public :: ok_c32, err_c32
 
     public :: ok_c64, err_c64
 
@@ -78,6 +86,18 @@ module formerr_result
         procedure :: unwrap_err_r16
         procedure :: unwrap_or_r16
 
+        procedure :: unwrap_r32
+        procedure :: unwrap_err_r32
+        procedure :: unwrap_or_r32
+
+        procedure :: unwrap_r64
+        procedure :: unwrap_err_r64
+        procedure :: unwrap_or_r64
+
+        procedure :: unwrap_r128
+        procedure :: unwrap_err_r128
+        procedure :: unwrap_or_r128
+
         procedure :: unwrap_i8
         procedure :: unwrap_err_i8
         procedure :: unwrap_or_i8
@@ -98,17 +118,17 @@ module formerr_result
         procedure :: unwrap_err_i128
         procedure :: unwrap_or_i128
 
-        procedure :: unwrap_r32
-        procedure :: unwrap_err_r32
-        procedure :: unwrap_or_r32
+        procedure :: unwrap_c8
+        procedure :: unwrap_err_c8
+        procedure :: unwrap_or_c8
 
-        procedure :: unwrap_r64
-        procedure :: unwrap_err_r64
-        procedure :: unwrap_or_r64
+        procedure :: unwrap_c16
+        procedure :: unwrap_err_c16
+        procedure :: unwrap_or_c16
 
-        procedure :: unwrap_r128
-        procedure :: unwrap_err_r128
-        procedure :: unwrap_or_r128
+        procedure :: unwrap_c32
+        procedure :: unwrap_err_c32
+        procedure :: unwrap_or_c32
 
         procedure :: unwrap_c64
         procedure :: unwrap_err_c64
@@ -470,6 +490,129 @@ contains
         end if
     end function unwrap_or_r16
 
+    pure elemental function ok_r32(val) result(res) !GCC$ attributes always_inline :: ok_r32
+        real(real32), intent(in) :: val
+        type(result_type) :: res
+        call res%set_right_r32(val)
+    end function ok_r32
+
+    pure elemental function err_r32(val) result(res) !GCC$ attributes always_inline :: err_r32
+        real(real32), intent(in) :: val
+        type(result_type) :: res
+        call res%set_left_r32(val)
+    end function err_r32
+
+    pure elemental function unwrap_r32(this) result(val) !GCC$ attributes always_inline :: unwrap_r32
+        class(result_type), intent(in) :: this
+        real(real32) :: val
+        if (this%is_err()) then
+            if (DO_CHECKS) error stop "unwrap_r32 called on Err value"
+        end if
+        val = this%get_right_r32()
+    end function unwrap_r32
+
+    pure elemental function unwrap_err_r32(this) result(val) !GCC$ attributes always_inline :: unwrap_err_r32
+        class(result_type), intent(in) :: this
+        real(real32) :: val
+        if (this%is_ok()) then
+            if (DO_CHECKS) error stop "unwrap_err_r32 called on Ok value"
+        end if
+        val = this%get_left_r32()
+    end function unwrap_err_r32
+
+    pure elemental function unwrap_or_r32(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_r32
+        class(result_type), intent(in) :: this
+        real(real32), intent(in) :: default_val
+        real(real32) :: val
+        if (this%is_ok()) then
+            val = this%get_right_r32()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_r32
+
+    pure elemental function ok_r64(val) result(res) !GCC$ attributes always_inline :: ok_r64
+        real(real64), intent(in) :: val
+        type(result_type) :: res
+        call res%set_right_r64(val)
+    end function ok_r64
+
+    pure elemental function err_r64(val) result(res) !GCC$ attributes always_inline :: err_r64
+        real(real64), intent(in) :: val
+        type(result_type) :: res
+        call res%set_left_r64(val)
+    end function err_r64
+
+    pure elemental function unwrap_r64(this) result(val) !GCC$ attributes always_inline :: unwrap_r64
+        class(result_type), intent(in) :: this
+        real(real64) :: val
+        if (this%is_err()) then
+            if (DO_CHECKS) error stop "unwrap_r64 called on Err value"
+        end if
+        val = this%get_right_r64()
+    end function unwrap_r64
+
+    pure elemental function unwrap_err_r64(this) result(val) !GCC$ attributes always_inline :: unwrap_err_r64
+        class(result_type), intent(in) :: this
+        real(real64) :: val
+        if (this%is_ok()) then
+            if (DO_CHECKS) error stop "unwrap_err_r64 called on Ok value"
+        end if
+        val = this%get_left_r64()
+    end function unwrap_err_r64
+
+    pure elemental function unwrap_or_r64(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_r64
+        class(result_type), intent(in) :: this
+        real(real64), intent(in) :: default_val
+        real(real64) :: val
+        if (this%is_ok()) then
+            val = this%get_right_r64()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_r64
+
+    pure elemental function ok_r128(val) result(res) !GCC$ attributes always_inline :: ok_r128
+        real(real128), intent(in) :: val
+        type(result_type) :: res
+        call res%set_right_r128(val)
+    end function ok_r128
+
+    pure elemental function err_r128(val) result(res) !GCC$ attributes always_inline :: err_r128
+        real(real128), intent(in) :: val
+        type(result_type) :: res
+        call res%set_left_r128(val)
+    end function err_r128
+
+    pure elemental function unwrap_r128(this) result(val) !GCC$ attributes always_inline :: unwrap_r128
+        class(result_type), intent(in) :: this
+        real(real128) :: val
+        if (this%is_err()) then
+            if (DO_CHECKS) error stop "unwrap_r128 called on Err value"
+        end if
+        val = this%get_right_r128()
+    end function unwrap_r128
+
+    pure elemental function unwrap_err_r128(this) result(val) !GCC$ attributes always_inline :: unwrap_err_r128
+        class(result_type), intent(in) :: this
+        real(real128) :: val
+        if (this%is_ok()) then
+            if (DO_CHECKS) error stop "unwrap_err_r128 called on Ok value"
+        end if
+        val = this%get_left_r128()
+    end function unwrap_err_r128
+
+    pure elemental function unwrap_or_r128(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_r128
+        class(result_type), intent(in) :: this
+        real(real128), intent(in) :: default_val
+        real(real128) :: val
+        if (this%is_ok()) then
+            val = this%get_right_r128()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_r128
+
     pure elemental function ok_i8(val) result(res) !GCC$ attributes always_inline :: ok_i8
         integer(int8), intent(in) :: val
         type(result_type) :: res
@@ -675,128 +818,128 @@ contains
         end if
     end function unwrap_or_i128
 
-    pure elemental function ok_r32(val) result(res) !GCC$ attributes always_inline :: ok_r32
-        real(real32), intent(in) :: val
+    pure elemental function ok_c8(val) result(res) !GCC$ attributes always_inline :: ok_c8
+        complex(real8), intent(in) :: val
         type(result_type) :: res
-        call res%set_right_r32(val)
-    end function ok_r32
+        call res%set_right_c8(val)
+    end function ok_c8
 
-    pure elemental function err_r32(val) result(res) !GCC$ attributes always_inline :: err_r32
-        real(real32), intent(in) :: val
+    pure elemental function err_c8(val) result(res) !GCC$ attributes always_inline :: err_c8
+        complex(real8), intent(in) :: val
         type(result_type) :: res
-        call res%set_left_r32(val)
-    end function err_r32
+        call res%set_left_c8(val)
+    end function err_c8
 
-    pure elemental function unwrap_r32(this) result(val) !GCC$ attributes always_inline :: unwrap_r32
+    pure elemental function unwrap_c8(this) result(val) !GCC$ attributes always_inline :: unwrap_c8
         class(result_type), intent(in) :: this
-        real(real32) :: val
+        complex(real8) :: val
         if (this%is_err()) then
-            if (DO_CHECKS) error stop "unwrap_r32 called on Err value"
+            if (DO_CHECKS) error stop "unwrap_c8 called on Err value"
         end if
-        val = this%get_right_r32()
-    end function unwrap_r32
+        val = this%get_right_c8()
+    end function unwrap_c8
 
-    pure elemental function unwrap_err_r32(this) result(val) !GCC$ attributes always_inline :: unwrap_err_r32
+    pure elemental function unwrap_err_c8(this) result(val) !GCC$ attributes always_inline :: unwrap_err_c8
         class(result_type), intent(in) :: this
-        real(real32) :: val
+        complex(real8) :: val
         if (this%is_ok()) then
-            if (DO_CHECKS) error stop "unwrap_err_r32 called on Ok value"
+            if (DO_CHECKS) error stop "unwrap_err_c8 called on Ok value"
         end if
-        val = this%get_left_r32()
-    end function unwrap_err_r32
+        val = this%get_left_c8()
+    end function unwrap_err_c8
 
-    pure elemental function unwrap_or_r32(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_r32
+    pure elemental function unwrap_or_c8(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_c8
         class(result_type), intent(in) :: this
-        real(real32), intent(in) :: default_val
-        real(real32) :: val
+        complex(real8), intent(in) :: default_val
+        complex(real8) :: val
         if (this%is_ok()) then
-            val = this%get_right_r32()
+            val = this%get_right_c8()
         else
             val = default_val
         end if
-    end function unwrap_or_r32
+    end function unwrap_or_c8
 
-    pure elemental function ok_r64(val) result(res) !GCC$ attributes always_inline :: ok_r64
-        real(real64), intent(in) :: val
+    pure elemental function ok_c16(val) result(res) !GCC$ attributes always_inline :: ok_c16
+        complex(real16), intent(in) :: val
         type(result_type) :: res
-        call res%set_right_r64(val)
-    end function ok_r64
+        call res%set_right_c16(val)
+    end function ok_c16
 
-    pure elemental function err_r64(val) result(res) !GCC$ attributes always_inline :: err_r64
-        real(real64), intent(in) :: val
+    pure elemental function err_c16(val) result(res) !GCC$ attributes always_inline :: err_c16
+        complex(real16), intent(in) :: val
         type(result_type) :: res
-        call res%set_left_r64(val)
-    end function err_r64
+        call res%set_left_c16(val)
+    end function err_c16
 
-    pure elemental function unwrap_r64(this) result(val) !GCC$ attributes always_inline :: unwrap_r64
+    pure elemental function unwrap_c16(this) result(val) !GCC$ attributes always_inline :: unwrap_c16
         class(result_type), intent(in) :: this
-        real(real64) :: val
+        complex(real16) :: val
         if (this%is_err()) then
-            if (DO_CHECKS) error stop "unwrap_r64 called on Err value"
+            if (DO_CHECKS) error stop "unwrap_c16 called on Err value"
         end if
-        val = this%get_right_r64()
-    end function unwrap_r64
+        val = this%get_right_c16()
+    end function unwrap_c16
 
-    pure elemental function unwrap_err_r64(this) result(val) !GCC$ attributes always_inline :: unwrap_err_r64
+    pure elemental function unwrap_err_c16(this) result(val) !GCC$ attributes always_inline :: unwrap_err_c16
         class(result_type), intent(in) :: this
-        real(real64) :: val
+        complex(real16) :: val
         if (this%is_ok()) then
-            if (DO_CHECKS) error stop "unwrap_err_r64 called on Ok value"
+            if (DO_CHECKS) error stop "unwrap_err_c16 called on Ok value"
         end if
-        val = this%get_left_r64()
-    end function unwrap_err_r64
+        val = this%get_left_c16()
+    end function unwrap_err_c16
 
-    pure elemental function unwrap_or_r64(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_r64
+    pure elemental function unwrap_or_c16(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_c16
         class(result_type), intent(in) :: this
-        real(real64), intent(in) :: default_val
-        real(real64) :: val
+        complex(real16), intent(in) :: default_val
+        complex(real16) :: val
         if (this%is_ok()) then
-            val = this%get_right_r64()
+            val = this%get_right_c16()
         else
             val = default_val
         end if
-    end function unwrap_or_r64
+    end function unwrap_or_c16
 
-    pure elemental function ok_r128(val) result(res) !GCC$ attributes always_inline :: ok_r128
-        real(real128), intent(in) :: val
+    pure elemental function ok_c32(val) result(res) !GCC$ attributes always_inline :: ok_c32
+        complex(real32), intent(in) :: val
         type(result_type) :: res
-        call res%set_right_r128(val)
-    end function ok_r128
+        call res%set_right_c32(val)
+    end function ok_c32
 
-    pure elemental function err_r128(val) result(res) !GCC$ attributes always_inline :: err_r128
-        real(real128), intent(in) :: val
+    pure elemental function err_c32(val) result(res) !GCC$ attributes always_inline :: err_c32
+        complex(real32), intent(in) :: val
         type(result_type) :: res
-        call res%set_left_r128(val)
-    end function err_r128
+        call res%set_left_c32(val)
+    end function err_c32
 
-    pure elemental function unwrap_r128(this) result(val) !GCC$ attributes always_inline :: unwrap_r128
+    pure elemental function unwrap_c32(this) result(val) !GCC$ attributes always_inline :: unwrap_c32
         class(result_type), intent(in) :: this
-        real(real128) :: val
+        complex(real32) :: val
         if (this%is_err()) then
-            if (DO_CHECKS) error stop "unwrap_r128 called on Err value"
+            if (DO_CHECKS) error stop "unwrap_c32 called on Err value"
         end if
-        val = this%get_right_r128()
-    end function unwrap_r128
+        val = this%get_right_c32()
+    end function unwrap_c32
 
-    pure elemental function unwrap_err_r128(this) result(val) !GCC$ attributes always_inline :: unwrap_err_r128
+    pure elemental function unwrap_err_c32(this) result(val) !GCC$ attributes always_inline :: unwrap_err_c32
         class(result_type), intent(in) :: this
-        real(real128) :: val
+        complex(real32) :: val
         if (this%is_ok()) then
-            if (DO_CHECKS) error stop "unwrap_err_r128 called on Ok value"
+            if (DO_CHECKS) error stop "unwrap_err_c32 called on Ok value"
         end if
-        val = this%get_left_r128()
-    end function unwrap_err_r128
+        val = this%get_left_c32()
+    end function unwrap_err_c32
 
-    pure elemental function unwrap_or_r128(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_r128
+    pure elemental function unwrap_or_c32(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_c32
         class(result_type), intent(in) :: this
-        real(real128), intent(in) :: default_val
-        real(real128) :: val
+        complex(real32), intent(in) :: default_val
+        complex(real32) :: val
         if (this%is_ok()) then
-            val = this%get_right_r128()
+            val = this%get_right_c32()
         else
             val = default_val
         end if
-    end function unwrap_or_r128
+    end function unwrap_or_c32
 
     pure elemental function ok_c64(val) result(res) !GCC$ attributes always_inline :: ok_c64
         complex(real64), intent(in) :: val

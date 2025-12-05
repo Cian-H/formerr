@@ -5,7 +5,7 @@ module formerr_result
     implicit none
     private
 
-    integer, parameter :: int128 = selected_int_kind(38)
+    {% include "shared/selected_kinds.f90" %}
 
     logical, parameter :: DO_CHECKS = .false.
 

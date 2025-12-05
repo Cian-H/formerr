@@ -1,8 +1,10 @@
 module formerr_either
-    use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, real64, real128
+    use, intrinsic :: iso_fortran_env, only: real32, real64, real128, int8, int16, int32, int64
     implicit none
     private
 
+    integer, parameter :: real8 = selected_real_kind(2, 2)
+    integer, parameter :: real16 = selected_real_kind(4, 4)
     integer, parameter :: int128 = selected_int_kind(38)
 
     public :: either, new_left, new_right
@@ -26,25 +28,31 @@ module formerr_either
 
     integer, parameter :: TYPE_R16 = 6
 
-    integer, parameter :: TYPE_I8 = 7
+    integer, parameter :: TYPE_R32 = 7
 
-    integer, parameter :: TYPE_I16 = 8
+    integer, parameter :: TYPE_R64 = 8
 
-    integer, parameter :: TYPE_I32 = 9
+    integer, parameter :: TYPE_R128 = 9
 
-    integer, parameter :: TYPE_I64 = 10
+    integer, parameter :: TYPE_I8 = 10
 
-    integer, parameter :: TYPE_I128 = 11
+    integer, parameter :: TYPE_I16 = 11
 
-    integer, parameter :: TYPE_R32 = 12
+    integer, parameter :: TYPE_I32 = 12
 
-    integer, parameter :: TYPE_R64 = 13
+    integer, parameter :: TYPE_I64 = 13
 
-    integer, parameter :: TYPE_R128 = 14
+    integer, parameter :: TYPE_I128 = 14
 
-    integer, parameter :: TYPE_C64 = 15
+    integer, parameter :: TYPE_C8 = 15
 
-    integer, parameter :: TYPE_C128 = 16
+    integer, parameter :: TYPE_C16 = 16
+
+    integer, parameter :: TYPE_C32 = 17
+
+    integer, parameter :: TYPE_C64 = 18
+
+    integer, parameter :: TYPE_C128 = 19
 
     type :: either
         private
@@ -107,6 +115,21 @@ module formerr_either
         procedure :: set_left_r16
         procedure :: set_right_r16
 
+        procedure :: get_left_r32
+        procedure :: get_right_r32
+        procedure :: set_left_r32
+        procedure :: set_right_r32
+
+        procedure :: get_left_r64
+        procedure :: get_right_r64
+        procedure :: set_left_r64
+        procedure :: set_right_r64
+
+        procedure :: get_left_r128
+        procedure :: get_right_r128
+        procedure :: set_left_r128
+        procedure :: set_right_r128
+
         procedure :: get_left_i8
         procedure :: get_right_i8
         procedure :: set_left_i8
@@ -132,20 +155,20 @@ module formerr_either
         procedure :: set_left_i128
         procedure :: set_right_i128
 
-        procedure :: get_left_r32
-        procedure :: get_right_r32
-        procedure :: set_left_r32
-        procedure :: set_right_r32
+        procedure :: get_left_c8
+        procedure :: get_right_c8
+        procedure :: set_left_c8
+        procedure :: set_right_c8
 
-        procedure :: get_left_r64
-        procedure :: get_right_r64
-        procedure :: set_left_r64
-        procedure :: set_right_r64
+        procedure :: get_left_c16
+        procedure :: get_right_c16
+        procedure :: set_left_c16
+        procedure :: set_right_c16
 
-        procedure :: get_left_r128
-        procedure :: get_right_r128
-        procedure :: set_left_r128
-        procedure :: set_right_r128
+        procedure :: get_left_c32
+        procedure :: get_right_c32
+        procedure :: set_left_c32
+        procedure :: set_right_c32
 
         procedure :: get_left_c64
         procedure :: get_right_c64
@@ -242,6 +265,15 @@ contains
         case (TYPE_R16)
             if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real(16))."
 
+        case (TYPE_R32)
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real(real32))."
+
+        case (TYPE_R64)
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real(real64))."
+
+        case (TYPE_R128)
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real(real128))."
+
         case (TYPE_I8)
             if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (integer(int8))."
 
@@ -257,14 +289,14 @@ contains
         case (TYPE_I128)
             if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (integer(int128))."
 
-        case (TYPE_R32)
-            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real(real32))."
+        case (TYPE_C8)
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (complex(real8))."
 
-        case (TYPE_R64)
-            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real(real64))."
+        case (TYPE_C16)
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (complex(real16))."
 
-        case (TYPE_R128)
-            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real(real128))."
+        case (TYPE_C32)
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (complex(real32))."
 
         case (TYPE_C64)
             if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (complex(real64))."
@@ -302,6 +334,15 @@ contains
         case (TYPE_R16)
             if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real(16))."
 
+        case (TYPE_R32)
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real(real32))."
+
+        case (TYPE_R64)
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real(real64))."
+
+        case (TYPE_R128)
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real(real128))."
+
         case (TYPE_I8)
             if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (integer(int8))."
 
@@ -317,14 +358,14 @@ contains
         case (TYPE_I128)
             if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (integer(int128))."
 
-        case (TYPE_R32)
-            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real(real32))."
+        case (TYPE_C8)
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (complex(real8))."
 
-        case (TYPE_R64)
-            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real(real64))."
+        case (TYPE_C16)
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (complex(real16))."
 
-        case (TYPE_R128)
-            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (real(real128))."
+        case (TYPE_C32)
+            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (complex(real32))."
 
         case (TYPE_C64)
             if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value (complex(real64))."
@@ -765,6 +806,186 @@ contains
         this%active_r = TYPE_R16
     end subroutine set_right_r16
 
+    pure elemental function get_left_r32(this) result(val) !GCC$ attributes always_inline :: get_left_r32
+        class(either), intent(in) :: this
+        real(real32) :: val
+        if (this%active_l == TYPE_R32) then
+            val = transfer(this%l_bytes, val)
+        else if (this%active_l == TYPE_DYN) then
+            select type (v => this%l_val_dyn)
+            type is (real(real32))
+                val = v
+            class default
+                if (DO_CHECKS) error stop "get_left_r32 type mismatch in dynamic storage"
+            end select
+        else
+            if (DO_CHECKS) error stop "get_left_r32 called on wrong type"
+        end if
+    end function get_left_r32
+
+    pure elemental function get_right_r32(this) result(val) !GCC$ attributes always_inline :: get_right_r32
+        class(either), intent(in) :: this
+        real(real32) :: val
+        if (this%active_r == TYPE_R32) then
+            val = transfer(this%r_bytes, val)
+        else if (this%active_r == TYPE_DYN) then
+            select type (v => this%r_val_dyn)
+            type is (real(real32))
+                val = v
+            class default
+                if (DO_CHECKS) error stop "get_right_r32 type mismatch in dynamic storage"
+            end select
+        else
+            if (DO_CHECKS) error stop "get_right_r32 called on wrong type"
+        end if
+    end function get_right_r32
+
+    pure elemental subroutine set_left_r32(this, val) !GCC$ attributes always_inline :: set_left_r32
+        class(either), intent(inout) :: this
+        real(real32), intent(in) :: val
+
+        if (this%active_l == TYPE_DYN) deallocate (this%l_val_dyn)
+        if (this%active_r == TYPE_DYN) deallocate (this%r_val_dyn)
+
+        this%active_r = TYPE_NONE
+
+        this%l_bytes = transfer(val, this%l_bytes)
+        this%active_l = TYPE_R32
+    end subroutine set_left_r32
+
+    pure elemental subroutine set_right_r32(this, val) !GCC$ attributes always_inline :: set_right_r32
+        class(either), intent(inout) :: this
+        real(real32), intent(in) :: val
+
+        if (this%active_l == TYPE_DYN) deallocate (this%l_val_dyn)
+        this%active_l = TYPE_NONE
+
+        if (this%active_r == TYPE_DYN) deallocate (this%r_val_dyn)
+
+        this%r_bytes = transfer(val, this%r_bytes)
+        this%active_r = TYPE_R32
+    end subroutine set_right_r32
+
+    pure elemental function get_left_r64(this) result(val) !GCC$ attributes always_inline :: get_left_r64
+        class(either), intent(in) :: this
+        real(real64) :: val
+        if (this%active_l == TYPE_R64) then
+            val = transfer(this%l_bytes, val)
+        else if (this%active_l == TYPE_DYN) then
+            select type (v => this%l_val_dyn)
+            type is (real(real64))
+                val = v
+            class default
+                if (DO_CHECKS) error stop "get_left_r64 type mismatch in dynamic storage"
+            end select
+        else
+            if (DO_CHECKS) error stop "get_left_r64 called on wrong type"
+        end if
+    end function get_left_r64
+
+    pure elemental function get_right_r64(this) result(val) !GCC$ attributes always_inline :: get_right_r64
+        class(either), intent(in) :: this
+        real(real64) :: val
+        if (this%active_r == TYPE_R64) then
+            val = transfer(this%r_bytes, val)
+        else if (this%active_r == TYPE_DYN) then
+            select type (v => this%r_val_dyn)
+            type is (real(real64))
+                val = v
+            class default
+                if (DO_CHECKS) error stop "get_right_r64 type mismatch in dynamic storage"
+            end select
+        else
+            if (DO_CHECKS) error stop "get_right_r64 called on wrong type"
+        end if
+    end function get_right_r64
+
+    pure elemental subroutine set_left_r64(this, val) !GCC$ attributes always_inline :: set_left_r64
+        class(either), intent(inout) :: this
+        real(real64), intent(in) :: val
+
+        if (this%active_l == TYPE_DYN) deallocate (this%l_val_dyn)
+        if (this%active_r == TYPE_DYN) deallocate (this%r_val_dyn)
+
+        this%active_r = TYPE_NONE
+
+        this%l_bytes = transfer(val, this%l_bytes)
+        this%active_l = TYPE_R64
+    end subroutine set_left_r64
+
+    pure elemental subroutine set_right_r64(this, val) !GCC$ attributes always_inline :: set_right_r64
+        class(either), intent(inout) :: this
+        real(real64), intent(in) :: val
+
+        if (this%active_l == TYPE_DYN) deallocate (this%l_val_dyn)
+        this%active_l = TYPE_NONE
+
+        if (this%active_r == TYPE_DYN) deallocate (this%r_val_dyn)
+
+        this%r_bytes = transfer(val, this%r_bytes)
+        this%active_r = TYPE_R64
+    end subroutine set_right_r64
+
+    pure elemental function get_left_r128(this) result(val) !GCC$ attributes always_inline :: get_left_r128
+        class(either), intent(in) :: this
+        real(real128) :: val
+        if (this%active_l == TYPE_R128) then
+            val = transfer(this%l_bytes, val)
+        else if (this%active_l == TYPE_DYN) then
+            select type (v => this%l_val_dyn)
+            type is (real(real128))
+                val = v
+            class default
+                if (DO_CHECKS) error stop "get_left_r128 type mismatch in dynamic storage"
+            end select
+        else
+            if (DO_CHECKS) error stop "get_left_r128 called on wrong type"
+        end if
+    end function get_left_r128
+
+    pure elemental function get_right_r128(this) result(val) !GCC$ attributes always_inline :: get_right_r128
+        class(either), intent(in) :: this
+        real(real128) :: val
+        if (this%active_r == TYPE_R128) then
+            val = transfer(this%r_bytes, val)
+        else if (this%active_r == TYPE_DYN) then
+            select type (v => this%r_val_dyn)
+            type is (real(real128))
+                val = v
+            class default
+                if (DO_CHECKS) error stop "get_right_r128 type mismatch in dynamic storage"
+            end select
+        else
+            if (DO_CHECKS) error stop "get_right_r128 called on wrong type"
+        end if
+    end function get_right_r128
+
+    pure elemental subroutine set_left_r128(this, val) !GCC$ attributes always_inline :: set_left_r128
+        class(either), intent(inout) :: this
+        real(real128), intent(in) :: val
+
+        if (this%active_l == TYPE_DYN) deallocate (this%l_val_dyn)
+        if (this%active_r == TYPE_DYN) deallocate (this%r_val_dyn)
+
+        this%active_r = TYPE_NONE
+
+        this%l_bytes = transfer(val, this%l_bytes)
+        this%active_l = TYPE_R128
+    end subroutine set_left_r128
+
+    pure elemental subroutine set_right_r128(this, val) !GCC$ attributes always_inline :: set_right_r128
+        class(either), intent(inout) :: this
+        real(real128), intent(in) :: val
+
+        if (this%active_l == TYPE_DYN) deallocate (this%l_val_dyn)
+        this%active_l = TYPE_NONE
+
+        if (this%active_r == TYPE_DYN) deallocate (this%r_val_dyn)
+
+        this%r_bytes = transfer(val, this%r_bytes)
+        this%active_r = TYPE_R128
+    end subroutine set_right_r128
+
     pure elemental function get_left_i8(this) result(val) !GCC$ attributes always_inline :: get_left_i8
         class(either), intent(in) :: this
         integer(int8) :: val
@@ -1065,43 +1286,43 @@ contains
         this%active_r = TYPE_I128
     end subroutine set_right_i128
 
-    pure elemental function get_left_r32(this) result(val) !GCC$ attributes always_inline :: get_left_r32
+    pure elemental function get_left_c8(this) result(val) !GCC$ attributes always_inline :: get_left_c8
         class(either), intent(in) :: this
-        real(real32) :: val
-        if (this%active_l == TYPE_R32) then
+        complex(real8) :: val
+        if (this%active_l == TYPE_C8) then
             val = transfer(this%l_bytes, val)
         else if (this%active_l == TYPE_DYN) then
             select type (v => this%l_val_dyn)
-            type is (real(real32))
+            type is (complex(real8))
                 val = v
             class default
-                if (DO_CHECKS) error stop "get_left_r32 type mismatch in dynamic storage"
+                if (DO_CHECKS) error stop "get_left_c8 type mismatch in dynamic storage"
             end select
         else
-            if (DO_CHECKS) error stop "get_left_r32 called on wrong type"
+            if (DO_CHECKS) error stop "get_left_c8 called on wrong type"
         end if
-    end function get_left_r32
+    end function get_left_c8
 
-    pure elemental function get_right_r32(this) result(val) !GCC$ attributes always_inline :: get_right_r32
+    pure elemental function get_right_c8(this) result(val) !GCC$ attributes always_inline :: get_right_c8
         class(either), intent(in) :: this
-        real(real32) :: val
-        if (this%active_r == TYPE_R32) then
+        complex(real8) :: val
+        if (this%active_r == TYPE_C8) then
             val = transfer(this%r_bytes, val)
         else if (this%active_r == TYPE_DYN) then
             select type (v => this%r_val_dyn)
-            type is (real(real32))
+            type is (complex(real8))
                 val = v
             class default
-                if (DO_CHECKS) error stop "get_right_r32 type mismatch in dynamic storage"
+                if (DO_CHECKS) error stop "get_right_c8 type mismatch in dynamic storage"
             end select
         else
-            if (DO_CHECKS) error stop "get_right_r32 called on wrong type"
+            if (DO_CHECKS) error stop "get_right_c8 called on wrong type"
         end if
-    end function get_right_r32
+    end function get_right_c8
 
-    pure elemental subroutine set_left_r32(this, val) !GCC$ attributes always_inline :: set_left_r32
+    pure elemental subroutine set_left_c8(this, val) !GCC$ attributes always_inline :: set_left_c8
         class(either), intent(inout) :: this
-        real(real32), intent(in) :: val
+        complex(real8), intent(in) :: val
 
         if (this%active_l == TYPE_DYN) deallocate (this%l_val_dyn)
         if (this%active_r == TYPE_DYN) deallocate (this%r_val_dyn)
@@ -1109,12 +1330,12 @@ contains
         this%active_r = TYPE_NONE
 
         this%l_bytes = transfer(val, this%l_bytes)
-        this%active_l = TYPE_R32
-    end subroutine set_left_r32
+        this%active_l = TYPE_C8
+    end subroutine set_left_c8
 
-    pure elemental subroutine set_right_r32(this, val) !GCC$ attributes always_inline :: set_right_r32
+    pure elemental subroutine set_right_c8(this, val) !GCC$ attributes always_inline :: set_right_c8
         class(either), intent(inout) :: this
-        real(real32), intent(in) :: val
+        complex(real8), intent(in) :: val
 
         if (this%active_l == TYPE_DYN) deallocate (this%l_val_dyn)
         this%active_l = TYPE_NONE
@@ -1122,46 +1343,46 @@ contains
         if (this%active_r == TYPE_DYN) deallocate (this%r_val_dyn)
 
         this%r_bytes = transfer(val, this%r_bytes)
-        this%active_r = TYPE_R32
-    end subroutine set_right_r32
+        this%active_r = TYPE_C8
+    end subroutine set_right_c8
 
-    pure elemental function get_left_r64(this) result(val) !GCC$ attributes always_inline :: get_left_r64
+    pure elemental function get_left_c16(this) result(val) !GCC$ attributes always_inline :: get_left_c16
         class(either), intent(in) :: this
-        real(real64) :: val
-        if (this%active_l == TYPE_R64) then
+        complex(real16) :: val
+        if (this%active_l == TYPE_C16) then
             val = transfer(this%l_bytes, val)
         else if (this%active_l == TYPE_DYN) then
             select type (v => this%l_val_dyn)
-            type is (real(real64))
+            type is (complex(real16))
                 val = v
             class default
-                if (DO_CHECKS) error stop "get_left_r64 type mismatch in dynamic storage"
+                if (DO_CHECKS) error stop "get_left_c16 type mismatch in dynamic storage"
             end select
         else
-            if (DO_CHECKS) error stop "get_left_r64 called on wrong type"
+            if (DO_CHECKS) error stop "get_left_c16 called on wrong type"
         end if
-    end function get_left_r64
+    end function get_left_c16
 
-    pure elemental function get_right_r64(this) result(val) !GCC$ attributes always_inline :: get_right_r64
+    pure elemental function get_right_c16(this) result(val) !GCC$ attributes always_inline :: get_right_c16
         class(either), intent(in) :: this
-        real(real64) :: val
-        if (this%active_r == TYPE_R64) then
+        complex(real16) :: val
+        if (this%active_r == TYPE_C16) then
             val = transfer(this%r_bytes, val)
         else if (this%active_r == TYPE_DYN) then
             select type (v => this%r_val_dyn)
-            type is (real(real64))
+            type is (complex(real16))
                 val = v
             class default
-                if (DO_CHECKS) error stop "get_right_r64 type mismatch in dynamic storage"
+                if (DO_CHECKS) error stop "get_right_c16 type mismatch in dynamic storage"
             end select
         else
-            if (DO_CHECKS) error stop "get_right_r64 called on wrong type"
+            if (DO_CHECKS) error stop "get_right_c16 called on wrong type"
         end if
-    end function get_right_r64
+    end function get_right_c16
 
-    pure elemental subroutine set_left_r64(this, val) !GCC$ attributes always_inline :: set_left_r64
+    pure elemental subroutine set_left_c16(this, val) !GCC$ attributes always_inline :: set_left_c16
         class(either), intent(inout) :: this
-        real(real64), intent(in) :: val
+        complex(real16), intent(in) :: val
 
         if (this%active_l == TYPE_DYN) deallocate (this%l_val_dyn)
         if (this%active_r == TYPE_DYN) deallocate (this%r_val_dyn)
@@ -1169,12 +1390,12 @@ contains
         this%active_r = TYPE_NONE
 
         this%l_bytes = transfer(val, this%l_bytes)
-        this%active_l = TYPE_R64
-    end subroutine set_left_r64
+        this%active_l = TYPE_C16
+    end subroutine set_left_c16
 
-    pure elemental subroutine set_right_r64(this, val) !GCC$ attributes always_inline :: set_right_r64
+    pure elemental subroutine set_right_c16(this, val) !GCC$ attributes always_inline :: set_right_c16
         class(either), intent(inout) :: this
-        real(real64), intent(in) :: val
+        complex(real16), intent(in) :: val
 
         if (this%active_l == TYPE_DYN) deallocate (this%l_val_dyn)
         this%active_l = TYPE_NONE
@@ -1182,46 +1403,46 @@ contains
         if (this%active_r == TYPE_DYN) deallocate (this%r_val_dyn)
 
         this%r_bytes = transfer(val, this%r_bytes)
-        this%active_r = TYPE_R64
-    end subroutine set_right_r64
+        this%active_r = TYPE_C16
+    end subroutine set_right_c16
 
-    pure elemental function get_left_r128(this) result(val) !GCC$ attributes always_inline :: get_left_r128
+    pure elemental function get_left_c32(this) result(val) !GCC$ attributes always_inline :: get_left_c32
         class(either), intent(in) :: this
-        real(real128) :: val
-        if (this%active_l == TYPE_R128) then
+        complex(real32) :: val
+        if (this%active_l == TYPE_C32) then
             val = transfer(this%l_bytes, val)
         else if (this%active_l == TYPE_DYN) then
             select type (v => this%l_val_dyn)
-            type is (real(real128))
+            type is (complex(real32))
                 val = v
             class default
-                if (DO_CHECKS) error stop "get_left_r128 type mismatch in dynamic storage"
+                if (DO_CHECKS) error stop "get_left_c32 type mismatch in dynamic storage"
             end select
         else
-            if (DO_CHECKS) error stop "get_left_r128 called on wrong type"
+            if (DO_CHECKS) error stop "get_left_c32 called on wrong type"
         end if
-    end function get_left_r128
+    end function get_left_c32
 
-    pure elemental function get_right_r128(this) result(val) !GCC$ attributes always_inline :: get_right_r128
+    pure elemental function get_right_c32(this) result(val) !GCC$ attributes always_inline :: get_right_c32
         class(either), intent(in) :: this
-        real(real128) :: val
-        if (this%active_r == TYPE_R128) then
+        complex(real32) :: val
+        if (this%active_r == TYPE_C32) then
             val = transfer(this%r_bytes, val)
         else if (this%active_r == TYPE_DYN) then
             select type (v => this%r_val_dyn)
-            type is (real(real128))
+            type is (complex(real32))
                 val = v
             class default
-                if (DO_CHECKS) error stop "get_right_r128 type mismatch in dynamic storage"
+                if (DO_CHECKS) error stop "get_right_c32 type mismatch in dynamic storage"
             end select
         else
-            if (DO_CHECKS) error stop "get_right_r128 called on wrong type"
+            if (DO_CHECKS) error stop "get_right_c32 called on wrong type"
         end if
-    end function get_right_r128
+    end function get_right_c32
 
-    pure elemental subroutine set_left_r128(this, val) !GCC$ attributes always_inline :: set_left_r128
+    pure elemental subroutine set_left_c32(this, val) !GCC$ attributes always_inline :: set_left_c32
         class(either), intent(inout) :: this
-        real(real128), intent(in) :: val
+        complex(real32), intent(in) :: val
 
         if (this%active_l == TYPE_DYN) deallocate (this%l_val_dyn)
         if (this%active_r == TYPE_DYN) deallocate (this%r_val_dyn)
@@ -1229,12 +1450,12 @@ contains
         this%active_r = TYPE_NONE
 
         this%l_bytes = transfer(val, this%l_bytes)
-        this%active_l = TYPE_R128
-    end subroutine set_left_r128
+        this%active_l = TYPE_C32
+    end subroutine set_left_c32
 
-    pure elemental subroutine set_right_r128(this, val) !GCC$ attributes always_inline :: set_right_r128
+    pure elemental subroutine set_right_c32(this, val) !GCC$ attributes always_inline :: set_right_c32
         class(either), intent(inout) :: this
-        real(real128), intent(in) :: val
+        complex(real32), intent(in) :: val
 
         if (this%active_l == TYPE_DYN) deallocate (this%l_val_dyn)
         this%active_l = TYPE_NONE
@@ -1242,8 +1463,8 @@ contains
         if (this%active_r == TYPE_DYN) deallocate (this%r_val_dyn)
 
         this%r_bytes = transfer(val, this%r_bytes)
-        this%active_r = TYPE_R128
-    end subroutine set_right_r128
+        this%active_r = TYPE_C32
+    end subroutine set_right_c32
 
     pure elemental function get_left_c64(this) result(val) !GCC$ attributes always_inline :: get_left_c64
         class(either), intent(in) :: this

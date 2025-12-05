@@ -1,10 +1,12 @@
 module formerr_option
     use formerr_either
     use stdlib_error, only: check
-    use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, real64, real128
+    use, intrinsic :: iso_fortran_env, only: real32, real64, real128, int8, int16, int32, int64
     implicit none
     private
 
+    integer, parameter :: real8 = selected_real_kind(2, 2)
+    integer, parameter :: real16 = selected_real_kind(4, 4)
     integer, parameter :: int128 = selected_int_kind(38)
 
     logical, parameter :: DO_CHECKS = .false.
@@ -24,6 +26,12 @@ module formerr_option
 
     public :: some_r16
 
+    public :: some_r32
+
+    public :: some_r64
+
+    public :: some_r128
+
     public :: some_i8
 
     public :: some_i16
@@ -34,11 +42,11 @@ module formerr_option
 
     public :: some_i128
 
-    public :: some_r32
+    public :: some_c8
 
-    public :: some_r64
+    public :: some_c16
 
-    public :: some_r128
+    public :: some_c32
 
     public :: some_c64
 
@@ -73,6 +81,15 @@ module formerr_option
         procedure :: unwrap_r16
         procedure :: unwrap_or_r16
 
+        procedure :: unwrap_r32
+        procedure :: unwrap_or_r32
+
+        procedure :: unwrap_r64
+        procedure :: unwrap_or_r64
+
+        procedure :: unwrap_r128
+        procedure :: unwrap_or_r128
+
         procedure :: unwrap_i8
         procedure :: unwrap_or_i8
 
@@ -88,14 +105,14 @@ module formerr_option
         procedure :: unwrap_i128
         procedure :: unwrap_or_i128
 
-        procedure :: unwrap_r32
-        procedure :: unwrap_or_r32
+        procedure :: unwrap_c8
+        procedure :: unwrap_or_c8
 
-        procedure :: unwrap_r64
-        procedure :: unwrap_or_r64
+        procedure :: unwrap_c16
+        procedure :: unwrap_or_c16
 
-        procedure :: unwrap_r128
-        procedure :: unwrap_or_r128
+        procedure :: unwrap_c32
+        procedure :: unwrap_or_c32
 
         procedure :: unwrap_c64
         procedure :: unwrap_or_c64
@@ -343,6 +360,87 @@ contains
         end if
     end function unwrap_or_r16
 
+    pure elemental function some_r32(val) result(res) !gcc$ attributes always_inline :: some_r32
+        real(real32), intent(in) :: val
+        type(option) :: res
+        call res%set_right_r32(val)
+    end function some_r32
+
+    pure elemental function unwrap_r32(this) result(val) !gcc$ attributes always_inline :: unwrap_
+        class(option), intent(in) :: this
+        real(real32) :: val
+        if (this%is_none()) then
+            if (do_checks) error stop "unwrap_r32 called on none value"
+        end if
+        ! we call the specialized getter from either
+        val = this%get_right_r32()
+    end function unwrap_r32
+
+    pure elemental function unwrap_or_r32(this, default_val) result(val) !gcc$ attributes always_inline :: unwrap_or_r32
+        class(option), intent(in) :: this
+        real(real32), intent(in) :: default_val
+        real(real32) :: val
+        if (this%is_some()) then
+            val = this%get_right_r32()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_r32
+
+    pure elemental function some_r64(val) result(res) !gcc$ attributes always_inline :: some_r64
+        real(real64), intent(in) :: val
+        type(option) :: res
+        call res%set_right_r64(val)
+    end function some_r64
+
+    pure elemental function unwrap_r64(this) result(val) !gcc$ attributes always_inline :: unwrap_
+        class(option), intent(in) :: this
+        real(real64) :: val
+        if (this%is_none()) then
+            if (do_checks) error stop "unwrap_r64 called on none value"
+        end if
+        ! we call the specialized getter from either
+        val = this%get_right_r64()
+    end function unwrap_r64
+
+    pure elemental function unwrap_or_r64(this, default_val) result(val) !gcc$ attributes always_inline :: unwrap_or_r64
+        class(option), intent(in) :: this
+        real(real64), intent(in) :: default_val
+        real(real64) :: val
+        if (this%is_some()) then
+            val = this%get_right_r64()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_r64
+
+    pure elemental function some_r128(val) result(res) !gcc$ attributes always_inline :: some_r128
+        real(real128), intent(in) :: val
+        type(option) :: res
+        call res%set_right_r128(val)
+    end function some_r128
+
+    pure elemental function unwrap_r128(this) result(val) !gcc$ attributes always_inline :: unwrap_
+        class(option), intent(in) :: this
+        real(real128) :: val
+        if (this%is_none()) then
+            if (do_checks) error stop "unwrap_r128 called on none value"
+        end if
+        ! we call the specialized getter from either
+        val = this%get_right_r128()
+    end function unwrap_r128
+
+    pure elemental function unwrap_or_r128(this, default_val) result(val) !gcc$ attributes always_inline :: unwrap_or_r128
+        class(option), intent(in) :: this
+        real(real128), intent(in) :: default_val
+        real(real128) :: val
+        if (this%is_some()) then
+            val = this%get_right_r128()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_r128
+
     pure elemental function some_i8(val) result(res) !gcc$ attributes always_inline :: some_i8
         integer(int8), intent(in) :: val
         type(option) :: res
@@ -478,86 +576,86 @@ contains
         end if
     end function unwrap_or_i128
 
-    pure elemental function some_r32(val) result(res) !gcc$ attributes always_inline :: some_r32
-        real(real32), intent(in) :: val
+    pure elemental function some_c8(val) result(res) !gcc$ attributes always_inline :: some_c8
+        complex(real8), intent(in) :: val
         type(option) :: res
-        call res%set_right_r32(val)
-    end function some_r32
+        call res%set_right_c8(val)
+    end function some_c8
 
-    pure elemental function unwrap_r32(this) result(val) !gcc$ attributes always_inline :: unwrap_
+    pure elemental function unwrap_c8(this) result(val) !gcc$ attributes always_inline :: unwrap_
         class(option), intent(in) :: this
-        real(real32) :: val
+        complex(real8) :: val
         if (this%is_none()) then
-            if (do_checks) error stop "unwrap_r32 called on none value"
+            if (do_checks) error stop "unwrap_c8 called on none value"
         end if
         ! we call the specialized getter from either
-        val = this%get_right_r32()
-    end function unwrap_r32
+        val = this%get_right_c8()
+    end function unwrap_c8
 
-    pure elemental function unwrap_or_r32(this, default_val) result(val) !gcc$ attributes always_inline :: unwrap_or_r32
+    pure elemental function unwrap_or_c8(this, default_val) result(val) !gcc$ attributes always_inline :: unwrap_or_c8
         class(option), intent(in) :: this
-        real(real32), intent(in) :: default_val
-        real(real32) :: val
+        complex(real8), intent(in) :: default_val
+        complex(real8) :: val
         if (this%is_some()) then
-            val = this%get_right_r32()
+            val = this%get_right_c8()
         else
             val = default_val
         end if
-    end function unwrap_or_r32
+    end function unwrap_or_c8
 
-    pure elemental function some_r64(val) result(res) !gcc$ attributes always_inline :: some_r64
-        real(real64), intent(in) :: val
+    pure elemental function some_c16(val) result(res) !gcc$ attributes always_inline :: some_c16
+        complex(real16), intent(in) :: val
         type(option) :: res
-        call res%set_right_r64(val)
-    end function some_r64
+        call res%set_right_c16(val)
+    end function some_c16
 
-    pure elemental function unwrap_r64(this) result(val) !gcc$ attributes always_inline :: unwrap_
+    pure elemental function unwrap_c16(this) result(val) !gcc$ attributes always_inline :: unwrap_
         class(option), intent(in) :: this
-        real(real64) :: val
+        complex(real16) :: val
         if (this%is_none()) then
-            if (do_checks) error stop "unwrap_r64 called on none value"
+            if (do_checks) error stop "unwrap_c16 called on none value"
         end if
         ! we call the specialized getter from either
-        val = this%get_right_r64()
-    end function unwrap_r64
+        val = this%get_right_c16()
+    end function unwrap_c16
 
-    pure elemental function unwrap_or_r64(this, default_val) result(val) !gcc$ attributes always_inline :: unwrap_or_r64
+    pure elemental function unwrap_or_c16(this, default_val) result(val) !gcc$ attributes always_inline :: unwrap_or_c16
         class(option), intent(in) :: this
-        real(real64), intent(in) :: default_val
-        real(real64) :: val
+        complex(real16), intent(in) :: default_val
+        complex(real16) :: val
         if (this%is_some()) then
-            val = this%get_right_r64()
+            val = this%get_right_c16()
         else
             val = default_val
         end if
-    end function unwrap_or_r64
+    end function unwrap_or_c16
 
-    pure elemental function some_r128(val) result(res) !gcc$ attributes always_inline :: some_r128
-        real(real128), intent(in) :: val
+    pure elemental function some_c32(val) result(res) !gcc$ attributes always_inline :: some_c32
+        complex(real32), intent(in) :: val
         type(option) :: res
-        call res%set_right_r128(val)
-    end function some_r128
+        call res%set_right_c32(val)
+    end function some_c32
 
-    pure elemental function unwrap_r128(this) result(val) !gcc$ attributes always_inline :: unwrap_
+    pure elemental function unwrap_c32(this) result(val) !gcc$ attributes always_inline :: unwrap_
         class(option), intent(in) :: this
-        real(real128) :: val
+        complex(real32) :: val
         if (this%is_none()) then
-            if (do_checks) error stop "unwrap_r128 called on none value"
+            if (do_checks) error stop "unwrap_c32 called on none value"
         end if
         ! we call the specialized getter from either
-        val = this%get_right_r128()
-    end function unwrap_r128
+        val = this%get_right_c32()
+    end function unwrap_c32
 
-    pure elemental function unwrap_or_r128(this, default_val) result(val) !gcc$ attributes always_inline :: unwrap_or_r128
+    pure elemental function unwrap_or_c32(this, default_val) result(val) !gcc$ attributes always_inline :: unwrap_or_c32
         class(option), intent(in) :: this
-        real(real128), intent(in) :: default_val
-        real(real128) :: val
+        complex(real32), intent(in) :: default_val
+        complex(real32) :: val
         if (this%is_some()) then
-            val = this%get_right_r128()
+            val = this%get_right_c32()
         else
             val = default_val
         end if
-    end function unwrap_or_r128
+    end function unwrap_or_c32
 
     pure elemental function some_c64(val) result(res) !gcc$ attributes always_inline :: some_c64
         complex(real64), intent(in) :: val
