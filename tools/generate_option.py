@@ -1,9 +1,10 @@
 from pathlib import Path
 
+from constants import TEMPLATES_DIR
 from supported_types import SUPPORTED_TYPES
 
 
-OPTION_TEMPLATE_PATH = Path(__file__).parent / "templates/option.fyyp"
+OPTION_TEMPLATE_PATH = TEMPLATES_DIR / "option.fyyp"
 
 with OPTION_TEMPLATE_PATH.open("rt") as f:
     OPTION_TEMPLATE = f.read()

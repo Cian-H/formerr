@@ -1,9 +1,10 @@
 from pathlib import Path
 
+from constants import TEMPLATES_DIR
 from supported_types import SUPPORTED_TYPES
 
 
-RESULT_TEMPLATE_PATH = Path(__file__).parent / "templates/result.fyyp"
+RESULT_TEMPLATE_PATH = TEMPLATES_DIR / "result.fyyp"
 
 with RESULT_TEMPLATE_PATH.open("rt") as f:
     RESULT_TEMPLATE = f.read()

@@ -1,9 +1,10 @@
 from pathlib import Path
 
+from constants import TEMPLATES_DIR
 from supported_types import SUPPORTED_TYPES
 
 
-EITHER_TEMPLATE_PATH = Path(__file__).parent / "templates/either.fyyp"
+EITHER_TEMPLATE_PATH = TEMPLATES_DIR / "either.fyyp"
 
 with EITHER_TEMPLATE_PATH.open("rt") as f:
     EITHER_TEMPLATE = f.read()
@@ -45,10 +46,14 @@ def generate_either():
 
         # Generic Dispatch Cases - Error on Union types for pointer return
         get_left_cases += f"        case ({const_name})\n"
-        get_left_cases += f'            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value ({t_type})."\n'
+        get_left_cases += f'            if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value ({
+            t_type
+        })."\n'
 
         get_right_cases += f"        case ({const_name})\n"
-        get_right_cases += f'            if (DO_CHECKS) error stop "get_right (Generic) cannot return pointer to Specialized (Union) value ({t_type})."\n'
+        get_right_cases += f'            if (DO_CHECKS) error stop "get_right (Generic) cannot return pointer to Specialized (Union) value ({
+            t_type
+        })."\n'
 
         # Specialized Implementation Code
 
@@ -95,12 +100,12 @@ def generate_either():
     pure elemental subroutine set_left_{t_suffix}(this, val) !GCC$ attributes always_inline :: set_left_{t_suffix}
         class(either), intent(inout) :: this
         {t_type}, intent(in) :: val
-        
+
         if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
         if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
-        
+
         this%active_r = TYPE_NONE
-        
+
         this%l_bytes = transfer(val, this%l_bytes)
         this%active_l = {const_name}
     end subroutine set_left_{t_suffix}"""
@@ -110,12 +115,12 @@ def generate_either():
     pure elemental subroutine set_right_{t_suffix}(this, val) !GCC$ attributes always_inline :: set_right_{t_suffix}
         class(either), intent(inout) :: this
         {t_type}, intent(in) :: val
-        
+
         if (this%active_l == TYPE_DYN) deallocate(this%l_val_dyn)
         this%active_l = TYPE_NONE
-        
+
         if (this%active_r == TYPE_DYN) deallocate(this%r_val_dyn)
-        
+
         this%r_bytes = transfer(val, this%r_bytes)
         this%active_r = {const_name}
     end subroutine set_right_{t_suffix}"""
