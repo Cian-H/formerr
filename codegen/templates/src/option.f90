@@ -12,7 +12,7 @@ module formerr_option
     public :: option, some, none, is_some, is_none, unwrap, unwrap_or
     public :: some_move, unwrap_move
     {% for t in supported_types.SUPPORTED_TYPES %}
-        {% include "option/public_generic_procedures.f90" %}
+        {% include "src/option/public_generic_procedures.f90" %}
     {% endfor %}
 
     type :: unit_type
@@ -26,7 +26,7 @@ module formerr_option
         procedure :: unwrap_or
         procedure :: unwrap_move
         {% for t in supported_types.SUPPORTED_TYPES %}
-            {% include "option/generic_procedures.f90" %}
+            {% include "src/option/generic_procedures.f90" %}
         {% endfor %}
     end type option
 
@@ -106,7 +106,7 @@ contains
 
     ! -- Specialized Implementations --
     {% for t in supported_types.SUPPORTED_TYPES %}
-        {% include "option/generic_impls.f90" %}
+        {% include "src/option/generic_impls.f90" %}
     {% endfor %}
 
 end module formerr_option

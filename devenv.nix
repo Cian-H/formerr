@@ -42,8 +42,8 @@
     codegen.exec = "python $DEVENV_ROOT/codegen/generate_code.py && treefmt";
     build-dev.exec = "codegen && fortran-fpm build";
     build.exec = "codegen && fortran-fpm build --profile release";
-    bench.exec = "codegen && build && fortran-fpm test bench --profile release";
-    test-dev.exec = "codegen && build-dev && fortran-fpm test";
-    test-release.exec = "codegen && build && fortran-fpm test --profile release";
+    bench.exec = "build && fortran-fpm test bench --profile release";
+    test-dev.exec = "build-dev && fortran-fpm test test";
+    test-release.exec = "build && fortran-fpm test test --profile release";
   };
 }

@@ -48,3 +48,62 @@ def iso_uses() -> str:
         for t in SUPPORTED_TYPES
         if t.is_iso and t.kind_parameter is not None
     )
+
+
+def get_test_value(t: FortranType) -> str:
+    if "integer" in t.name:
+        kind = (
+            t.kind_parameter
+            if t.is_iso
+            else ("int128" if "int128" in t.type_def else None)
+        )
+        suffix = f"_{kind}" if kind else ""
+        return f"42{suffix}"
+    elif "complex" in t.name:
+        # Extract inner real kind
+        if "(" in t.type_def:
+            inner_kind = t.type_def.split("(")[1].split(")")[0]
+            return f"(1.0_{inner_kind}, 2.0_{inner_kind})"
+        return "(1.0, 2.0)"
+    elif "real" in t.name:
+        kind = t.kind_parameter
+        if not kind:
+            # Handle legacy kinds like real(8) -> 8
+            if "(" in t.type_def:
+                kind = t.type_def.split("(")[1].split(")")[0]
+
+        suffix = f"_{kind}" if kind else ""
+        return f"1.23{suffix}"
+    elif "logical" in t.name:
+        return ".true."
+    return "0"
+
+
+def get_err_value(t: FortranType) -> str:
+    if "integer" in t.name:
+        kind = (
+            t.kind_parameter
+            if t.is_iso
+            else ("int128" if "int128" in t.type_def else None)
+        )
+        suffix = f"_{kind}" if kind else ""
+        return f"-1{suffix}"
+    elif "complex" in t.name:
+        if "(" in t.type_def:
+            inner_kind = t.type_def.split("(")[1].split(")")[0]
+            return f"(-1.0_{inner_kind}, -2.0_{inner_kind})"
+        return "(-1.0, -2.0)"
+    elif "real" in t.name:
+        kind = t.kind_parameter
+        if not kind:
+            if "(" in t.type_def:
+                kind = t.type_def.split("(")[1].split(")")[0]
+        suffix = f"_{kind}" if kind else ""
+        return f"-9.99{suffix}"
+    elif "logical" in t.name:
+        return ".false."
+    return "0"
+
+
+def is_numeric(t: FortranType) -> bool:
+    return "integer" in t.name or "real" in t.name or "complex" in t.name

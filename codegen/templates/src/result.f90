@@ -13,7 +13,7 @@ module formerr_result
     public :: ok_move, err_move, unwrap_move_to_err, unsafe_unwrap_move
     public :: ok_string, err_string
     {% for t in supported_types.SUPPORTED_TYPES %}
-        {% include "result/public_generic_procedures.f90" %}
+        {% include "src/result/public_generic_procedures.f90" %}
     {% endfor %}
 
     type, extends(either) :: result_type
@@ -25,9 +25,9 @@ module formerr_result
         procedure :: unwrap_or
         procedure :: unwrap_move_to_err
         procedure :: unsafe_unwrap_move
-        {% include "result/specialized_procedures.f90" %}
+        {% include "src/result/specialized_procedures.f90" %}
         {% for t in supported_types.SUPPORTED_TYPES %}
-            {% include "result/generic_procedures.f90" %}
+            {% include "src/result/generic_procedures.f90" %}
         {% endfor %}
     end type result_type
 
@@ -134,9 +134,9 @@ contains
     end subroutine unsafe_unwrap_move
 
     ! -- Specialized Implementations --
-    {% include "result/specialized_impls.f90" %}
+    {% include "src/result/specialized_impls.f90" %}
     {% for t in supported_types.SUPPORTED_TYPES %}
-        {% include "result/generic_impls.f90" %}
+        {% include "src/result/generic_impls.f90" %}
     {% endfor %}
 
 end module formerr_result

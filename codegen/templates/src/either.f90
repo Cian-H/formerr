@@ -49,7 +49,7 @@ module formerr_either
 
         ! Specialized Procedures
         {% for t in supported_types.SUPPORTED_TYPES %}
-            {% include "either/generic_procedures.f90" %}
+            {% include "src/either/generic_procedures.f90" %}
         {% endfor %}
     end type either
 
@@ -209,7 +209,7 @@ contains
 
     ! -- Specialized Implementations --
     {% for t in supported_types.SUPPORTED_TYPES %}
-        {% include "either/generic_impls.f90" %}
+        {% include "src/either/generic_impls.f90" %}
     {% endfor %}
 
 end module formerr_either

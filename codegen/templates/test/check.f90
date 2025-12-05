@@ -63,27 +63,27 @@ contains
             end if
 
             if (allocated(error)) then
-                if (error%stat == 77) then
-                    status_str = "[SKIPPED]"
-                elseif (passed) then
-                    status_str = "[PASS]"
-                else
-                    status_str = "[FAIL]"
-                    stat = stat + 1
-                end if
+                 if (error%stat == 77) then
+                     status_str = "[SKIPPED]"
+                 elseif (passed) then
+                     status_str = "[PASS]"
+                 else
+                     status_str = "[FAIL]"
+                     stat = stat + 1
+                 end if
             else
-                if (passed) then
-                    status_str = "[PASS]"
-                else
-                    status_str = "[FAIL]"
-                    stat = stat + 1
-                end if
+                 if (passed) then
+                     status_str = "[PASS]"
+                 else
+                     status_str = "[FAIL]"
+                     stat = stat + 1
+                 end if
             end if
 
             print '(A20, 1X, A40, 1X, A10)', &
-                trim(suite_name), &
-                trim(testsuite(i)%name), &
-                status_str
+                  trim(suite_name), &
+                  trim(testsuite(i)%name), &
+                  status_str
 
             if (.not. passed .and. allocated(error)) then
                 if (allocated(error%message)) then
@@ -91,7 +91,7 @@ contains
                 end if
             end if
 
-            if (allocated(error)) deallocate (error)
+            if (allocated(error)) deallocate(error)
         end do
     end subroutine run_testsuite_table
 

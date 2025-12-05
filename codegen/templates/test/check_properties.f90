@@ -3,13 +3,11 @@ module property_tests
     use formerr_option, only: option, some, none
     use formerr_result, only: result_type, ok, err
     use formerr_either, only: either, new_left, new_right
-    use, intrinsic :: iso_fortran_env, only: real32, real64, real128, int8, int16, int32, int64
+    use, intrinsic :: iso_fortran_env, only: {{ supported_types.iso_uses() }}
     implicit none
     private
 
-    integer, parameter :: real8 = selected_real_kind(2, 2)
-    integer, parameter :: real16 = selected_real_kind(4, 4)
-    integer, parameter :: int128 = selected_int_kind(38)
+    {% include "shared/selected_kinds.f90" %}
 
     public :: test_option_invariants, test_result_invariants, test_either_invariants
 
