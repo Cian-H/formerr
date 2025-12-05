@@ -19,6 +19,9 @@ state. This approach can lead to:
 **Formerr** introduces the Result, Option, and Either monads—concepts popularized by functional
 languages and modern systems languages like Rust—adapted for Modern Fortran.
 
+It leverages `jinja` templates to generate **specialized, zero-allocation** implementations for
+common types, while providing a generic fallback for complex objects.
+
 ## Installation
 
 Formerr is designed to be used with the
@@ -38,8 +41,37 @@ formerr = { git = "https://github.com/cian-h/formerr" }
 Use Result when an operation might succeed or fail. It wraps either a success value (Ok) or an
 error value (Err).
 
+#### Specialized (High Performance)
+
+For primitive types, use the specialized constructors and accessors (suffixed with type, e.g.,
+`_real`, `_int`, `_r64`). These avoid dynamic allocation.
+
 ```fortran
-program demo_result
+program demo_result_fast
+    use formerr_result
+    implicit none
+
+    type(result_type) :: res
+
+    ! 1. Successful operation (Specialized for real)
+    res = ok_real(5.0 / 2.0)
+
+    if (res%is_ok()) then
+        ! Zero-allocation access
+        print *, "Result is:", res%unwrap_real()
+    else
+        ! Handle error
+        print *, "Error code:", res%unwrap_err_int() ! Assuming error is an int
+    end if
+end program demo_result_fast
+```
+
+#### Generic (Flexible)
+
+For objects, arrays, or when performance is secondary to flexibility.
+
+```fortran
+program demo_result_generic
     use formerr_result
     implicit none
 
@@ -69,8 +101,7 @@ program demo_result
     ! 2. Failed operation
     res = divide(10.0, 0.0)
 
-    ! You can also use unwrap_or to provide a default value if it failed
-    ! (Note: unwrap_or returns an allocatable, not a pointer)
+    ! You can also use unwrap_or to provide a default value
     print *, "Safe result:", res%unwrap_or(-1.0)
 
 contains
@@ -86,13 +117,12 @@ contains
         end if
     end function divide
 
-end program demo_result
+end program demo_result_generic
 ```
 
 ### 2. The Option Type (some / none)
 
-Use Option when a value might be present or absent (avoiding null pointer exceptions or magic
-numbers like -1).
+Use Option when a value might be present or absent.
 
 ```fortran
 program demo_option
@@ -100,80 +130,105 @@ program demo_option
     implicit none
 
     type(option) :: user_id
-    class(*), pointer :: p
 
-    user_id = find_user("alice")
+    ! Specialized usage
+    user_id = some_int(1234)
 
     if (user_id%is_some()) then
-        p => user_id%unwrap()
-        select type (p)
-        type is (integer)
-            print *, "User ID found:", p
-        end select
+        print *, "User ID found:", user_id%unwrap_int()
     else
         print *, "User not found."
     end if
 
-    ! defaults
+    ! Defaults
     user_id = none()
-    ! Returns 0 if none, otherwise the contained value
-    call print_id(user_id%unwrap_or(0))
+    call print_id(user_id%unwrap_or_int(0))
 
 contains
-
-    function find_user(name) result(opt)
-        character(*), intent(in) :: name
-        type(option) :: opt
-
-        if (name == "alice") then
-            opt = some(1234)
-        else
-            opt = none()
-        end if
-    end function find_user
-
     subroutine print_id(val)
-        class(*), intent(in) :: val
-        select type (val)
-        type is (integer)
-            print *, "ID is ", val
-        end select
+        integer, intent(in) :: val
+        print *, "ID is ", val
     end subroutine
-
 end program demo_option
 ```
+
+## Safety & Pitfalls (Read This!)
+
+While this library aims to improve safety, the nature of Fortran and performance optimizations
+introduces some pitfalls you **must** be aware of. **This library DOES NOT protect you from the
+following if you are careless:**
+
+### 1. Mixing Generic and Specialized APIs
+
+**This is the most dangerous pitfall.**
+
+- **Using purely generic APIs is safe:** If you construct a result using a generic constructor
+  (e.g., `ok(my_real_variable)`), then calling the generic `unwrap()` method will correctly access
+  the value.
+- **The danger arises when mixing:** If you construct a result using a **specialized** constructor
+  (e.g., `ok_int(5)` to maximize performance by avoiding allocations), you **MUST** use the
+  corresponding specialized unwrap (e.g., `unwrap_int()`).
+- Calling the **generic** `unwrap()` method on a value created with a **specialized** constructor
+  will return a **NULL POINTER** (silent failure if `DO_CHECKS` is off, or crash if `DO_CHECKS`
+  is on). This occurs because the generic method attempts to access dynamic storage, which is
+  empty for specialized values.
+- **Rule of thumb:** Pair your constructors and unwrappers:
+  `ok_X(...)` -> `unwrap_X()`. `ok(...)` -> `unwrap()`.
+
+### 2. Default Safety Checks are ON
+
+To prioritize safety, the library defines `DO_CHECKS = .true.` by default.
+
+- `unwrap()` on an `Err` value **WILL** stop the program with an informative error message.
+- This introduces a small branching overhead.
+- For maximum performance in tight loops (where logic is proven correct), you can disable this by
+  recompiling with `DO_CHECKS = .false.` in the source modules.
+
+### 3. Pointer Lifetimes (Generic API)
+
+The generic `unwrap()` returns a pointer (`class(*), pointer`) to internal storage.
+
+**Why?**
+This design avoids the performance penalty of deep-copying potentially large polymorphic objects
+when accessing them.
+
+**Mitigation:**
+
+- **Scope it:** Use `select type` or `associate` blocks to limit the pointer's usage to the
+  immediate scope where the `Result` is valid.
+- **Copy it:** If you need the value to outlive the `Result`, allocate a new copy:
+  `allocate(my_copy, source=res%unwrap())`.
+- **Beware:** The pointer becomes a **dangling pointer** immediately after the parent `Result`
+  object is destroyed. The goal of this library is to *minimize* the likelihood of dangling
+  pointers, with some kind of compiler modifications (e.g: a borrow checker) *eliminiating*
+  these mistakes is impossible for a mere library to achieve.
+
+### 4. Polymorphic Allocation Overhead
+
+The generic `ok(val)` and `unwrap_or(default)` functions involve allocation
+(`allocate(..., source=val)`).
+
+- In tight loops, use the specialized `_int`, `_real`, `_r64` variants. These use purely
+  stack/in-place memory (`transfer`) and are significantly faster.
 
 ## API Reference
 
 ### formerr_result
 
-- **Constructors**:
-  - `ok(val)`: Creates a `success` result containing `val`.
-  - `err(val)`: Creates a `failure` result containing `val`.
+- **Generic Constructors**: `ok(val)`, `err(val)` (Allocates)
+- **Specialized Constructors**: `ok_int(v)`, `ok_real(v)`, `ok_r64(v)`, `ok_log(v)`, `ok_string(v)`
+  (Fast)
 - **Methods**:
-  - `is_ok()`: Logical. `.TRUE.` if `success`.
-  - `is_err()`: Logical. `.TRUE.` if `failure`.
-  - `unwrap()`: Returns `class(*)`, pointer to the Ok value. Fails if Err.
-  - `unwrap_err()`: Returns `class(*)`, pointer to the Err value. Fails if Ok.
-  - `unwrap_or(default)`: Returns `class(*), allocatable`. Returns content if Ok, default if Err.
+  - `is_ok()`, `is_err()`: Logical checks.
+  - `unwrap()`, `unwrap_err()`: Generic pointer access (Careful!).
+  - `unwrap_int()`, `unwrap_real()`, ...: Specialized value access (Fast).
+  - `unwrap_or(default)`: Returns allocatable clone of value or default.
+  - `unwrap_or_int(default)`, ...: Returns value or default (Fast).
 
 ### formerr_option
 
-- **Constructors**:
-  - `some(val)`: Creates an option containing `val`.
-  - `none()`: Creates an empty option.
-- **Methods**:
-  - `is_some()`: Logical. `.TRUE.` if value exists.
-  - `is_none()`: Logical. `.TRUE.` if empty.
-  - `unwrap()`: Returns `class(*)`, pointer to the value. Fails if None.
-  - `unwrap_or(default)`: Returns `class(*), allocatable`. Returns content if Some, default if None.
-
-### formerr_either
-
-The base type for Option and Result. Useful for generic "Left vs Right" logic.
-
-- **Constructors**: `left(val)`, `right(val)`.
-- **Methods**: `is_left()`, `is_right()`, `get_left()`, `get_right()`.
+- **Constructors**: `some(val)`, `none()`, `some_int(v)`, etc.
+- **Methods**: Same patterns as Result (`is_some`, `is_none`, `unwrap_X`).
 
 ## Development Environment
 
@@ -189,12 +244,9 @@ This project supports **Nix** and **devenv** for a reproducible development envi
    direnv allow
    ```
 
-   This will automatically install gfortran, fortls (Language Server), fpm, and formatting tools
-   defined in devenv.nix.
-
 ### Running Tests
 
-To run the test suite (powered by test-drive):
+To run the test suite:
 
 ```sh
 fortran-fpm test
@@ -202,15 +254,4 @@ fortran-fpm test
 
 ## License
 
-This project is licensed under the MIT License - see the
-[LICENSE.md](http://docs.google.com/LICENSE.md) file for details.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository.
-1. Create your feature branch (`git checkout -b feature/AmazingFeature`).
-1. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
-1. Push to the branch (`git push origin feature/AmazingFeature`).
-1. Open a Pull Request.
+This project is licensed under the MIT License - see the LICENSE.md file for details.
