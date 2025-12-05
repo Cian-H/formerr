@@ -8,7 +8,7 @@ module formerr_either
     public :: either, new_left, new_right
     public :: TYPE_SSO_STRING, TYPE_DYN, TYPE_NONE
 
-    logical, parameter :: DO_CHECKS = .false.
+    logical, parameter :: DO_CHECKS = .true.
     integer, parameter :: BUFFER_SIZE = {{ supported_types.buffer_size() }}
 
     ! Type constants
