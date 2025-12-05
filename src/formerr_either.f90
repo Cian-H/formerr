@@ -54,6 +54,8 @@ module formerr_either
 
     integer, parameter :: TYPE_C128 = 19
 
+    integer, parameter :: TYPE_SSO_STRING = 127
+
     type :: either
         private
         integer :: active_l = TYPE_NONE

@@ -16,6 +16,7 @@ module formerr_either
     {% for t in supported_types.SUPPORTED_TYPES %}
         integer, parameter :: {{ t.const_name }} = {{ loop.index }}
     {% endfor %}
+    integer, parameter :: TYPE_SSO_STRING = 127
 
     type :: either
         private
