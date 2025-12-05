@@ -1,14 +1,14 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import re
 
 
 @dataclass(frozen=True)
 class FortranType:
-    name: str
-    type_def: str
-    suffix: str
-    size: int
-    is_iso: bool = False
+    name: str = field(repr=True)
+    type_def: str = field(repr=False)
+    suffix: str = field(repr=False)
+    size: int = field(repr=False)
+    is_iso: bool = field(default=False, repr=False)
 
     def __post_init__(self):
         """
@@ -53,28 +53,6 @@ class FortranType:
         match = re.search(r"\((.*?)\)", self.type_def)
         return match.group(1) if match else None
 
-
-SUPPORTED_TYPES = [
-    # --- Standard Intrinsics ---
-    FortranType("integer", "integer", "int", size=4, is_iso=False),
-    FortranType("real", "real", "real", size=4, is_iso=False),
-    FortranType("logical", "logical", "log", size=4, is_iso=False),
-    FortranType("complex", "complex", "cpx", size=8, is_iso=False),
-    # --- Legacy / Hardcoded Kinds ---
-    FortranType("real(8)", "real(8)", "r8", size=8, is_iso=False),
-    FortranType("real(16)", "real(16)", "r16", size=16, is_iso=False),
-    # --- ISO_FORTRAN_ENV Types ---
-    # Integers
-    FortranType("integer(int8)", "integer(int8)", "i8", size=1, is_iso=True),
-    FortranType("integer(int16)", "integer(int16)", "i16", size=2, is_iso=True),
-    FortranType("integer(int32)", "integer(int32)", "i32", size=4, is_iso=True),
-    FortranType("integer(int64)", "integer(int64)", "i64", size=8, is_iso=True),
-    FortranType("integer(int128)", "integer(int128)", "i128", size=16, is_iso=True),
-    # Reals
-    FortranType("real(real32)", "real(real32)", "r32", size=4, is_iso=True),
-    FortranType("real(real64)", "real(real64)", "r64", size=8, is_iso=True),
-    FortranType("real(real128)", "real(real128)", "r128", size=16, is_iso=True),
-    # Complex
-    FortranType("complex(real64)", "complex(real64)", "c64", size=16, is_iso=True),
-    FortranType("complex(real128)", "complex(real128)", "c128", size=32, is_iso=True),
-]
+    @property
+    def const_name(self) -> str:
+        return f"TYPE_{self.suffix.upper()}"

@@ -11,21 +11,37 @@ module formerr_result
 
     public :: result_type, ok, err, is_ok, is_err, unwrap, unwrap_err, unwrap_or
     public :: ok_move, err_move, unwrap_move_to_err, unsafe_unwrap_move
+
     public :: ok_int, err_int
-    public :: ok_i8, err_i8
-    public :: ok_i16, err_i16
-    public :: ok_i32, err_i32
-    public :: ok_i64, err_i64
-    public :: ok_i128, err_i128
+
     public :: ok_real, err_real
-    public :: ok_r32, err_r32
-    public :: ok_r64, err_r64
-    public :: ok_r128, err_r128
-    public :: ok_r8, err_r8
-    public :: ok_r16, err_r16
+
     public :: ok_log, err_log
+
     public :: ok_cpx, err_cpx
+
+    public :: ok_r8, err_r8
+
+    public :: ok_r16, err_r16
+
+    public :: ok_i8, err_i8
+
+    public :: ok_i16, err_i16
+
+    public :: ok_i32, err_i32
+
+    public :: ok_i64, err_i64
+
+    public :: ok_i128, err_i128
+
+    public :: ok_r32, err_r32
+
+    public :: ok_r64, err_r64
+
+    public :: ok_r128, err_r128
+
     public :: ok_c64, err_c64
+
     public :: ok_c128, err_c128
 
     type, extends(either) :: result_type
@@ -37,51 +53,67 @@ module formerr_result
         procedure :: unwrap_or
         procedure :: unwrap_move_to_err
         procedure :: unsafe_unwrap_move
+
         procedure :: unwrap_int
         procedure :: unwrap_err_int
         procedure :: unwrap_or_int
-        procedure :: unwrap_i8
-        procedure :: unwrap_err_i8
-        procedure :: unwrap_or_i8
-        procedure :: unwrap_i16
-        procedure :: unwrap_err_i16
-        procedure :: unwrap_or_i16
-        procedure :: unwrap_i32
-        procedure :: unwrap_err_i32
-        procedure :: unwrap_or_i32
-        procedure :: unwrap_i64
-        procedure :: unwrap_err_i64
-        procedure :: unwrap_or_i64
-        procedure :: unwrap_i128
-        procedure :: unwrap_err_i128
-        procedure :: unwrap_or_i128
+
         procedure :: unwrap_real
         procedure :: unwrap_err_real
         procedure :: unwrap_or_real
-        procedure :: unwrap_r32
-        procedure :: unwrap_err_r32
-        procedure :: unwrap_or_r32
-        procedure :: unwrap_r64
-        procedure :: unwrap_err_r64
-        procedure :: unwrap_or_r64
-        procedure :: unwrap_r128
-        procedure :: unwrap_err_r128
-        procedure :: unwrap_or_r128
-        procedure :: unwrap_r8
-        procedure :: unwrap_err_r8
-        procedure :: unwrap_or_r8
-        procedure :: unwrap_r16
-        procedure :: unwrap_err_r16
-        procedure :: unwrap_or_r16
+
         procedure :: unwrap_log
         procedure :: unwrap_err_log
         procedure :: unwrap_or_log
+
         procedure :: unwrap_cpx
         procedure :: unwrap_err_cpx
         procedure :: unwrap_or_cpx
+
+        procedure :: unwrap_r8
+        procedure :: unwrap_err_r8
+        procedure :: unwrap_or_r8
+
+        procedure :: unwrap_r16
+        procedure :: unwrap_err_r16
+        procedure :: unwrap_or_r16
+
+        procedure :: unwrap_i8
+        procedure :: unwrap_err_i8
+        procedure :: unwrap_or_i8
+
+        procedure :: unwrap_i16
+        procedure :: unwrap_err_i16
+        procedure :: unwrap_or_i16
+
+        procedure :: unwrap_i32
+        procedure :: unwrap_err_i32
+        procedure :: unwrap_or_i32
+
+        procedure :: unwrap_i64
+        procedure :: unwrap_err_i64
+        procedure :: unwrap_or_i64
+
+        procedure :: unwrap_i128
+        procedure :: unwrap_err_i128
+        procedure :: unwrap_or_i128
+
+        procedure :: unwrap_r32
+        procedure :: unwrap_err_r32
+        procedure :: unwrap_or_r32
+
+        procedure :: unwrap_r64
+        procedure :: unwrap_err_r64
+        procedure :: unwrap_or_r64
+
+        procedure :: unwrap_r128
+        procedure :: unwrap_err_r128
+        procedure :: unwrap_or_r128
+
         procedure :: unwrap_c64
         procedure :: unwrap_err_c64
         procedure :: unwrap_or_c64
+
         procedure :: unwrap_c128
         procedure :: unwrap_err_c128
         procedure :: unwrap_or_c128
@@ -232,6 +264,211 @@ contains
             val = default_val
         end if
     end function unwrap_or_int
+
+    pure elemental function ok_real(val) result(res) !GCC$ attributes always_inline :: ok_real
+        real, intent(in) :: val
+        type(result_type) :: res
+        call res%set_right_real(val)
+    end function ok_real
+
+    pure elemental function err_real(val) result(res) !GCC$ attributes always_inline :: err_real
+        real, intent(in) :: val
+        type(result_type) :: res
+        call res%set_left_real(val)
+    end function err_real
+
+    pure elemental function unwrap_real(this) result(val) !GCC$ attributes always_inline :: unwrap_real
+        class(result_type), intent(in) :: this
+        real :: val
+        if (this%is_err()) then
+            if (DO_CHECKS) error stop "unwrap_real called on Err value"
+        end if
+        val = this%get_right_real()
+    end function unwrap_real
+
+    pure elemental function unwrap_err_real(this) result(val) !GCC$ attributes always_inline :: unwrap_err_real
+        class(result_type), intent(in) :: this
+        real :: val
+        if (this%is_ok()) then
+            if (DO_CHECKS) error stop "unwrap_err_real called on Ok value"
+        end if
+        val = this%get_left_real()
+    end function unwrap_err_real
+
+    pure elemental function unwrap_or_real(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_real
+        class(result_type), intent(in) :: this
+        real, intent(in) :: default_val
+        real :: val
+        if (this%is_ok()) then
+            val = this%get_right_real()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_real
+
+    pure elemental function ok_log(val) result(res) !GCC$ attributes always_inline :: ok_log
+        logical, intent(in) :: val
+        type(result_type) :: res
+        call res%set_right_log(val)
+    end function ok_log
+
+    pure elemental function err_log(val) result(res) !GCC$ attributes always_inline :: err_log
+        logical, intent(in) :: val
+        type(result_type) :: res
+        call res%set_left_log(val)
+    end function err_log
+
+    pure elemental function unwrap_log(this) result(val) !GCC$ attributes always_inline :: unwrap_log
+        class(result_type), intent(in) :: this
+        logical :: val
+        if (this%is_err()) then
+            if (DO_CHECKS) error stop "unwrap_log called on Err value"
+        end if
+        val = this%get_right_log()
+    end function unwrap_log
+
+    pure elemental function unwrap_err_log(this) result(val) !GCC$ attributes always_inline :: unwrap_err_log
+        class(result_type), intent(in) :: this
+        logical :: val
+        if (this%is_ok()) then
+            if (DO_CHECKS) error stop "unwrap_err_log called on Ok value"
+        end if
+        val = this%get_left_log()
+    end function unwrap_err_log
+
+    pure elemental function unwrap_or_log(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_log
+        class(result_type), intent(in) :: this
+        logical, intent(in) :: default_val
+        logical :: val
+        if (this%is_ok()) then
+            val = this%get_right_log()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_log
+
+    pure elemental function ok_cpx(val) result(res) !GCC$ attributes always_inline :: ok_cpx
+        complex, intent(in) :: val
+        type(result_type) :: res
+        call res%set_right_cpx(val)
+    end function ok_cpx
+
+    pure elemental function err_cpx(val) result(res) !GCC$ attributes always_inline :: err_cpx
+        complex, intent(in) :: val
+        type(result_type) :: res
+        call res%set_left_cpx(val)
+    end function err_cpx
+
+    pure elemental function unwrap_cpx(this) result(val) !GCC$ attributes always_inline :: unwrap_cpx
+        class(result_type), intent(in) :: this
+        complex :: val
+        if (this%is_err()) then
+            if (DO_CHECKS) error stop "unwrap_cpx called on Err value"
+        end if
+        val = this%get_right_cpx()
+    end function unwrap_cpx
+
+    pure elemental function unwrap_err_cpx(this) result(val) !GCC$ attributes always_inline :: unwrap_err_cpx
+        class(result_type), intent(in) :: this
+        complex :: val
+        if (this%is_ok()) then
+            if (DO_CHECKS) error stop "unwrap_err_cpx called on Ok value"
+        end if
+        val = this%get_left_cpx()
+    end function unwrap_err_cpx
+
+    pure elemental function unwrap_or_cpx(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_cpx
+        class(result_type), intent(in) :: this
+        complex, intent(in) :: default_val
+        complex :: val
+        if (this%is_ok()) then
+            val = this%get_right_cpx()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_cpx
+
+    pure elemental function ok_r8(val) result(res) !GCC$ attributes always_inline :: ok_r8
+        real(8), intent(in) :: val
+        type(result_type) :: res
+        call res%set_right_r8(val)
+    end function ok_r8
+
+    pure elemental function err_r8(val) result(res) !GCC$ attributes always_inline :: err_r8
+        real(8), intent(in) :: val
+        type(result_type) :: res
+        call res%set_left_r8(val)
+    end function err_r8
+
+    pure elemental function unwrap_r8(this) result(val) !GCC$ attributes always_inline :: unwrap_r8
+        class(result_type), intent(in) :: this
+        real(8) :: val
+        if (this%is_err()) then
+            if (DO_CHECKS) error stop "unwrap_r8 called on Err value"
+        end if
+        val = this%get_right_r8()
+    end function unwrap_r8
+
+    pure elemental function unwrap_err_r8(this) result(val) !GCC$ attributes always_inline :: unwrap_err_r8
+        class(result_type), intent(in) :: this
+        real(8) :: val
+        if (this%is_ok()) then
+            if (DO_CHECKS) error stop "unwrap_err_r8 called on Ok value"
+        end if
+        val = this%get_left_r8()
+    end function unwrap_err_r8
+
+    pure elemental function unwrap_or_r8(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_r8
+        class(result_type), intent(in) :: this
+        real(8), intent(in) :: default_val
+        real(8) :: val
+        if (this%is_ok()) then
+            val = this%get_right_r8()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_r8
+
+    pure elemental function ok_r16(val) result(res) !GCC$ attributes always_inline :: ok_r16
+        real(16), intent(in) :: val
+        type(result_type) :: res
+        call res%set_right_r16(val)
+    end function ok_r16
+
+    pure elemental function err_r16(val) result(res) !GCC$ attributes always_inline :: err_r16
+        real(16), intent(in) :: val
+        type(result_type) :: res
+        call res%set_left_r16(val)
+    end function err_r16
+
+    pure elemental function unwrap_r16(this) result(val) !GCC$ attributes always_inline :: unwrap_r16
+        class(result_type), intent(in) :: this
+        real(16) :: val
+        if (this%is_err()) then
+            if (DO_CHECKS) error stop "unwrap_r16 called on Err value"
+        end if
+        val = this%get_right_r16()
+    end function unwrap_r16
+
+    pure elemental function unwrap_err_r16(this) result(val) !GCC$ attributes always_inline :: unwrap_err_r16
+        class(result_type), intent(in) :: this
+        real(16) :: val
+        if (this%is_ok()) then
+            if (DO_CHECKS) error stop "unwrap_err_r16 called on Ok value"
+        end if
+        val = this%get_left_r16()
+    end function unwrap_err_r16
+
+    pure elemental function unwrap_or_r16(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_r16
+        class(result_type), intent(in) :: this
+        real(16), intent(in) :: default_val
+        real(16) :: val
+        if (this%is_ok()) then
+            val = this%get_right_r16()
+        else
+            val = default_val
+        end if
+    end function unwrap_or_r16
 
     pure elemental function ok_i8(val) result(res) !GCC$ attributes always_inline :: ok_i8
         integer(int8), intent(in) :: val
@@ -438,47 +675,6 @@ contains
         end if
     end function unwrap_or_i128
 
-    pure elemental function ok_real(val) result(res) !GCC$ attributes always_inline :: ok_real
-        real, intent(in) :: val
-        type(result_type) :: res
-        call res%set_right_real(val)
-    end function ok_real
-
-    pure elemental function err_real(val) result(res) !GCC$ attributes always_inline :: err_real
-        real, intent(in) :: val
-        type(result_type) :: res
-        call res%set_left_real(val)
-    end function err_real
-
-    pure elemental function unwrap_real(this) result(val) !GCC$ attributes always_inline :: unwrap_real
-        class(result_type), intent(in) :: this
-        real :: val
-        if (this%is_err()) then
-            if (DO_CHECKS) error stop "unwrap_real called on Err value"
-        end if
-        val = this%get_right_real()
-    end function unwrap_real
-
-    pure elemental function unwrap_err_real(this) result(val) !GCC$ attributes always_inline :: unwrap_err_real
-        class(result_type), intent(in) :: this
-        real :: val
-        if (this%is_ok()) then
-            if (DO_CHECKS) error stop "unwrap_err_real called on Ok value"
-        end if
-        val = this%get_left_real()
-    end function unwrap_err_real
-
-    pure elemental function unwrap_or_real(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_real
-        class(result_type), intent(in) :: this
-        real, intent(in) :: default_val
-        real :: val
-        if (this%is_ok()) then
-            val = this%get_right_real()
-        else
-            val = default_val
-        end if
-    end function unwrap_or_real
-
     pure elemental function ok_r32(val) result(res) !GCC$ attributes always_inline :: ok_r32
         real(real32), intent(in) :: val
         type(result_type) :: res
@@ -601,170 +797,6 @@ contains
             val = default_val
         end if
     end function unwrap_or_r128
-
-    pure elemental function ok_r8(val) result(res) !GCC$ attributes always_inline :: ok_r8
-        real(8), intent(in) :: val
-        type(result_type) :: res
-        call res%set_right_r8(val)
-    end function ok_r8
-
-    pure elemental function err_r8(val) result(res) !GCC$ attributes always_inline :: err_r8
-        real(8), intent(in) :: val
-        type(result_type) :: res
-        call res%set_left_r8(val)
-    end function err_r8
-
-    pure elemental function unwrap_r8(this) result(val) !GCC$ attributes always_inline :: unwrap_r8
-        class(result_type), intent(in) :: this
-        real(8) :: val
-        if (this%is_err()) then
-            if (DO_CHECKS) error stop "unwrap_r8 called on Err value"
-        end if
-        val = this%get_right_r8()
-    end function unwrap_r8
-
-    pure elemental function unwrap_err_r8(this) result(val) !GCC$ attributes always_inline :: unwrap_err_r8
-        class(result_type), intent(in) :: this
-        real(8) :: val
-        if (this%is_ok()) then
-            if (DO_CHECKS) error stop "unwrap_err_r8 called on Ok value"
-        end if
-        val = this%get_left_r8()
-    end function unwrap_err_r8
-
-    pure elemental function unwrap_or_r8(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_r8
-        class(result_type), intent(in) :: this
-        real(8), intent(in) :: default_val
-        real(8) :: val
-        if (this%is_ok()) then
-            val = this%get_right_r8()
-        else
-            val = default_val
-        end if
-    end function unwrap_or_r8
-
-    pure elemental function ok_r16(val) result(res) !GCC$ attributes always_inline :: ok_r16
-        real(16), intent(in) :: val
-        type(result_type) :: res
-        call res%set_right_r16(val)
-    end function ok_r16
-
-    pure elemental function err_r16(val) result(res) !GCC$ attributes always_inline :: err_r16
-        real(16), intent(in) :: val
-        type(result_type) :: res
-        call res%set_left_r16(val)
-    end function err_r16
-
-    pure elemental function unwrap_r16(this) result(val) !GCC$ attributes always_inline :: unwrap_r16
-        class(result_type), intent(in) :: this
-        real(16) :: val
-        if (this%is_err()) then
-            if (DO_CHECKS) error stop "unwrap_r16 called on Err value"
-        end if
-        val = this%get_right_r16()
-    end function unwrap_r16
-
-    pure elemental function unwrap_err_r16(this) result(val) !GCC$ attributes always_inline :: unwrap_err_r16
-        class(result_type), intent(in) :: this
-        real(16) :: val
-        if (this%is_ok()) then
-            if (DO_CHECKS) error stop "unwrap_err_r16 called on Ok value"
-        end if
-        val = this%get_left_r16()
-    end function unwrap_err_r16
-
-    pure elemental function unwrap_or_r16(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_r16
-        class(result_type), intent(in) :: this
-        real(16), intent(in) :: default_val
-        real(16) :: val
-        if (this%is_ok()) then
-            val = this%get_right_r16()
-        else
-            val = default_val
-        end if
-    end function unwrap_or_r16
-
-    pure elemental function ok_log(val) result(res) !GCC$ attributes always_inline :: ok_log
-        logical, intent(in) :: val
-        type(result_type) :: res
-        call res%set_right_log(val)
-    end function ok_log
-
-    pure elemental function err_log(val) result(res) !GCC$ attributes always_inline :: err_log
-        logical, intent(in) :: val
-        type(result_type) :: res
-        call res%set_left_log(val)
-    end function err_log
-
-    pure elemental function unwrap_log(this) result(val) !GCC$ attributes always_inline :: unwrap_log
-        class(result_type), intent(in) :: this
-        logical :: val
-        if (this%is_err()) then
-            if (DO_CHECKS) error stop "unwrap_log called on Err value"
-        end if
-        val = this%get_right_log()
-    end function unwrap_log
-
-    pure elemental function unwrap_err_log(this) result(val) !GCC$ attributes always_inline :: unwrap_err_log
-        class(result_type), intent(in) :: this
-        logical :: val
-        if (this%is_ok()) then
-            if (DO_CHECKS) error stop "unwrap_err_log called on Ok value"
-        end if
-        val = this%get_left_log()
-    end function unwrap_err_log
-
-    pure elemental function unwrap_or_log(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_log
-        class(result_type), intent(in) :: this
-        logical, intent(in) :: default_val
-        logical :: val
-        if (this%is_ok()) then
-            val = this%get_right_log()
-        else
-            val = default_val
-        end if
-    end function unwrap_or_log
-
-    pure elemental function ok_cpx(val) result(res) !GCC$ attributes always_inline :: ok_cpx
-        complex, intent(in) :: val
-        type(result_type) :: res
-        call res%set_right_cpx(val)
-    end function ok_cpx
-
-    pure elemental function err_cpx(val) result(res) !GCC$ attributes always_inline :: err_cpx
-        complex, intent(in) :: val
-        type(result_type) :: res
-        call res%set_left_cpx(val)
-    end function err_cpx
-
-    pure elemental function unwrap_cpx(this) result(val) !GCC$ attributes always_inline :: unwrap_cpx
-        class(result_type), intent(in) :: this
-        complex :: val
-        if (this%is_err()) then
-            if (DO_CHECKS) error stop "unwrap_cpx called on Err value"
-        end if
-        val = this%get_right_cpx()
-    end function unwrap_cpx
-
-    pure elemental function unwrap_err_cpx(this) result(val) !GCC$ attributes always_inline :: unwrap_err_cpx
-        class(result_type), intent(in) :: this
-        complex :: val
-        if (this%is_ok()) then
-            if (DO_CHECKS) error stop "unwrap_err_cpx called on Ok value"
-        end if
-        val = this%get_left_cpx()
-    end function unwrap_err_cpx
-
-    pure elemental function unwrap_or_cpx(this, default_val) result(val) !GCC$ attributes always_inline :: unwrap_or_cpx
-        class(result_type), intent(in) :: this
-        complex, intent(in) :: default_val
-        complex :: val
-        if (this%is_ok()) then
-            val = this%get_right_cpx()
-        else
-            val = default_val
-        end if
-    end function unwrap_or_cpx
 
     pure elemental function ok_c64(val) result(res) !GCC$ attributes always_inline :: ok_c64
         complex(real64), intent(in) :: val

@@ -1,7 +1,7 @@
 module formerr_option
     use formerr_either
     use stdlib_error, only: check
-    use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, real64, real128
+    {% include "shared/iso_uses.f90" %}
     implicit none
     private
 
@@ -11,7 +11,9 @@ module formerr_option
 
     public :: option, some, none, is_some, is_none, unwrap, unwrap_or
     public :: some_move, unwrap_move
-    {public_procedures}
+    {% for t in supported_types.SUPPORTED_TYPES %}
+        {% include "option/public_generic_procedures.f90" %}
+    {% endfor %}
 
     type :: unit_type
     end type unit_type
@@ -23,7 +25,9 @@ module formerr_option
         procedure :: unwrap
         procedure :: unwrap_or
         procedure :: unwrap_move
-        {type_bound_procedures}
+        {% for t in supported_types.SUPPORTED_TYPES %}
+            {% include "option/generic_procedures.f90" %}
+        {% endfor %}
     end type option
 
 contains
@@ -90,7 +94,7 @@ contains
         if (DO_CHECKS) call check(this%is_some(), "unwrap_move called on None value")
 
         ! 1. Prepare the None state (Unit type)
-        allocate(temp_none, source=u)
+        allocate (temp_none, source=u)
 
         ! 2. Perform the swap
         ! Move the Right (Some) value to dest
@@ -101,6 +105,8 @@ contains
     end subroutine unwrap_move
 
     ! -- Specialized Implementations --
-    {specialized_impls}
+    {% for t in supported_types.SUPPORTED_TYPES %}
+        {% include "option/generic_impls.f90" %}
+    {% endfor %}
 
 end module formerr_option

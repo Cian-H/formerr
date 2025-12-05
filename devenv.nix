@@ -12,6 +12,7 @@
     pkgs.fortran-fpm
     pkgs.fprettify
     pkgs.fypp
+    pkgs.jinja2-cli
   ];
 
   languages.fortran.enable = true;
@@ -20,7 +21,10 @@
     enable = true;
     config.programs = {
       alejandra.enable = true;
-      fprettify.enable = true;
+      fprettify = {
+        enable = true;
+        excludes = ["codegen/templates/*"];
+      };
       ruff-format.enable = true;
     };
   };
@@ -35,7 +39,7 @@
   };
 
   scripts = {
-    codegen.exec = "python $DEVENV_ROOT/tools/generate.py && treefmt";
+    codegen.exec = "python $DEVENV_ROOT/codegen/generate_code.py && treefmt";
     build-dev.exec = "codegen && fortran-fpm build";
     build.exec = "codegen && fortran-fpm build --profile release";
     bench.exec = "codegen && build && fortran-fpm test bench --profile release";

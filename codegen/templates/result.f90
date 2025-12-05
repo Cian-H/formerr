@@ -1,7 +1,7 @@
 module formerr_result
     use formerr_either
     use stdlib_error, only: check
-    use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, real64, real128
+    {% include "shared/iso_uses.f90" %}
     implicit none
     private
 
@@ -11,7 +11,9 @@ module formerr_result
 
     public :: result_type, ok, err, is_ok, is_err, unwrap, unwrap_err, unwrap_or
     public :: ok_move, err_move, unwrap_move_to_err, unsafe_unwrap_move
-    {public_procedures}
+    {% for t in supported_types.SUPPORTED_TYPES %}
+        {% include "result/public_generic_procedures.f90" %}
+    {% endfor %}
 
     type, extends(either) :: result_type
     contains
@@ -22,7 +24,9 @@ module formerr_result
         procedure :: unwrap_or
         procedure :: unwrap_move_to_err
         procedure :: unsafe_unwrap_move
-        {type_bound_procedures}
+        {% for t in supported_types.SUPPORTED_TYPES %}
+            {% include "result/generic_procedures.f90" %}
+        {% endfor %}
     end type result_type
 
 contains
@@ -104,7 +108,7 @@ contains
         if (DO_CHECKS) call check(this%is_ok(), "unwrap_move_to_err called on Err value")
 
         ! 1. Allocate the replacement error first to ensure safety if alloc fails
-        allocate(temp_err, source=replacement_err)
+        allocate (temp_err, source=replacement_err)
 
         ! 2. Perform the swap
         ! Move the Right (Ok) value to dest (leaves Right unallocated)
@@ -128,6 +132,8 @@ contains
     end subroutine unsafe_unwrap_move
 
     ! -- Specialized Implementations --
-    {specialized_impls}
+    {% for t in supported_types.SUPPORTED_TYPES %}
+        {% include "result/generic_impls.f90" %}
+    {% endfor %}
 
 end module formerr_result

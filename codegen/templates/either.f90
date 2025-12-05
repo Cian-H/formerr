@@ -1,20 +1,21 @@
 module formerr_either
-    use, intrinsic :: iso_fortran_env, only: int8, int16, int32, int64, real32, real64, real128
+    {% include "shared/iso_uses.f90" %}
     implicit none
     private
 
     integer, parameter :: int128 = selected_int_kind(38)
 
     public :: either, new_left, new_right
-    {public_procedures}
+
+    logical, parameter :: DO_CHECKS = .false.
+    integer, parameter :: STORAGE_SIZE = {{ supported_types.max_size() }}
 
     ! Type constants
-    integer, parameter :: TYPE_NONE = 0
-    integer, parameter :: TYPE_DYN = 1
-    logical, parameter :: DO_CHECKS = .false.
-    {type_constants}
-
-
+    integer, parameter :: TYPE_NONE = -1
+    integer, parameter :: TYPE_DYN = 0
+    {% for t in supported_types.SUPPORTED_TYPES %}
+        integer, parameter :: {{ t.const_name }} = {{ loop.index }}
+    {% endfor %}
 
     type :: either
         private
@@ -26,7 +27,8 @@ module formerr_either
         class(*), allocatable :: r_val_dyn
 
         ! Monomorphised storage (embedded, non-allocatable)
-        {type_fields}
+        integer(int8) :: l_bytes(STORAGE_SIZE)
+        integer(int8) :: r_bytes(STORAGE_SIZE)
     contains
         procedure :: is_left
         procedure :: is_right
@@ -45,7 +47,9 @@ module formerr_either
         procedure, private :: clear_right
 
         ! Specialized Procedures
-        {type_bound_procedures}
+        {% for t in supported_types.SUPPORTED_TYPES %}
+            {% include "either/generic_procedures.f90" %}
+        {% endfor %}
     end type either
 
     interface either
@@ -92,14 +96,14 @@ contains
 
     pure subroutine clear_left(this)
         class(either), intent(inout) :: this
-        if (allocated(this%l_val_dyn)) deallocate(this%l_val_dyn)
+        if (allocated(this%l_val_dyn)) deallocate (this%l_val_dyn)
         ! Monomorphised fields are embedded, no deallocation needed
         this%active_l = TYPE_NONE
     end subroutine clear_left
 
     pure subroutine clear_right(this)
         class(either), intent(inout) :: this
-        if (allocated(this%r_val_dyn)) deallocate(this%r_val_dyn)
+        if (allocated(this%r_val_dyn)) deallocate (this%r_val_dyn)
         ! Monomorphised fields are embedded, no deallocation needed
         this%active_r = TYPE_NONE
     end subroutine clear_right
@@ -112,7 +116,10 @@ contains
         select case (this%active_l)
         case (TYPE_DYN)
             if (allocated(this%l_val_dyn)) ptr => this%l_val_dyn
-        {get_left_cases}
+        {% for t in supported_types.SUPPORTED_TYPES %}
+            case ({{ t.const_name }})
+                if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value ({{ t.type_def }})."
+        {% endfor %}
         end select
     end function get_left
 
@@ -124,7 +131,10 @@ contains
         select case (this%active_r)
         case (TYPE_DYN)
             if (allocated(this%r_val_dyn)) ptr => this%r_val_dyn
-        {get_right_cases}
+        {% for t in supported_types.SUPPORTED_TYPES %}
+            case ({{ t.const_name }})
+                if (DO_CHECKS) error stop "get_left (Generic) cannot return pointer to Specialized (Union) value ({{ t.type_def }})."
+        {% endfor %}
         end select
     end function get_right
 
@@ -136,10 +146,9 @@ contains
         call this%clear_left()
         call this%clear_right()
 
-        select type(val)
-        {set_left_cases}
+        select type (val)
         class default
-            allocate(this%l_val_dyn, source=val)
+            allocate (this%l_val_dyn, source=val)
             this%active_l = TYPE_DYN
         end select
     end subroutine set_left
@@ -151,10 +160,9 @@ contains
         call this%clear_left()
         call this%clear_right()
 
-        select type(val)
-        {set_right_cases}
+        select type (val)
         class default
-            allocate(this%r_val_dyn, source=val)
+            allocate (this%r_val_dyn, source=val)
             this%active_r = TYPE_DYN
         end select
     end subroutine set_right
@@ -169,15 +177,14 @@ contains
         ! If val is not allocated, do nothing (or error?)
         if (.not. allocated(val)) return
 
-        select type(val)
-        {move_left_cases}
+        select type (val)
         class default
             call move_alloc(from=val, to=this%l_val_dyn)
             this%active_l = TYPE_DYN
         end select
 
         ! Deallocate source 'val' if it was allocated (and not moved via move_alloc)
-        if (allocated(val)) deallocate(val)
+        if (allocated(val)) deallocate (val)
 
     end subroutine move_left
 
@@ -190,17 +197,18 @@ contains
 
         if (.not. allocated(val)) return
 
-        select type(val)
-        {move_right_cases}
+        select type (val)
         class default
             call move_alloc(from=val, to=this%r_val_dyn)
             this%active_r = TYPE_DYN
         end select
 
-        if (allocated(val)) deallocate(val)
+        if (allocated(val)) deallocate (val)
     end subroutine move_right
 
     ! -- Specialized Implementations --
-    {specialized_impls}
+    {% for t in supported_types.SUPPORTED_TYPES %}
+        {% include "either/generic_impls.f90" %}
+    {% endfor %}
 
 end module formerr_either
