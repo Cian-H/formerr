@@ -6,6 +6,7 @@ module formerr_either
     {% include "shared/selected_kinds.f90" %}
 
     public :: either, new_left, new_right
+    public :: TYPE_SSO_STRING, TYPE_DYN, TYPE_NONE
 
     logical, parameter :: DO_CHECKS = .false.
     integer, parameter :: BUFFER_SIZE = {{ supported_types.buffer_size() }}
@@ -19,7 +20,6 @@ module formerr_either
     integer, parameter :: TYPE_SSO_STRING = 127
 
     type :: either
-        private
         integer :: active_l = TYPE_NONE
         integer :: active_r = TYPE_NONE
 

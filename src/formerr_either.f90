@@ -8,6 +8,7 @@ module formerr_either
     integer, parameter :: int128 = selected_int_kind(38)
 
     public :: either, new_left, new_right
+    public :: TYPE_SSO_STRING, TYPE_DYN, TYPE_NONE
 
     logical, parameter :: DO_CHECKS = .false.
     integer, parameter :: BUFFER_SIZE = 4
@@ -57,7 +58,6 @@ module formerr_either
     integer, parameter :: TYPE_SSO_STRING = 127
 
     type :: either
-        private
         integer :: active_l = TYPE_NONE
         integer :: active_r = TYPE_NONE
 
