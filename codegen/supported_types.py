@@ -1,3 +1,5 @@
+import math
+
 from ftypes import FortranType
 
 
@@ -32,11 +34,15 @@ SUPPORTED_TYPES = [
 ]
 
 
-def max_size():
+def max_size() -> int:
     return max(t.size for t in SUPPORTED_TYPES)
 
 
-def iso_uses():
+def buffer_size() -> int:
+    return math.ceil(max_size() / 8)
+
+
+def iso_uses() -> str:
     return ", ".join(
         t.kind_parameter
         for t in SUPPORTED_TYPES

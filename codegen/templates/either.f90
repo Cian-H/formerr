@@ -8,7 +8,7 @@ module formerr_either
     public :: either, new_left, new_right
 
     logical, parameter :: DO_CHECKS = .false.
-    integer, parameter :: STORAGE_SIZE = {{ supported_types.max_size() }}
+    integer, parameter :: BUFFER_SIZE = {{ supported_types.buffer_size() }}
 
     ! Type constants
     integer, parameter :: TYPE_NONE = -1
@@ -27,8 +27,8 @@ module formerr_either
         class(*), allocatable :: r_val_dyn
 
         ! Monomorphised storage (embedded, non-allocatable)
-        integer(int8) :: l_bytes(STORAGE_SIZE)
-        integer(int8) :: r_bytes(STORAGE_SIZE)
+        integer(int64) :: l_bytes(BUFFER_SIZE)
+        integer(int64) :: r_bytes(BUFFER_SIZE)
     contains
         procedure :: is_left
         procedure :: is_right
